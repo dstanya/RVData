@@ -191,22 +191,22 @@ class NEIDRV2(RV2):
             # Extension description table entries
             ext_table["extension_name"].append(out_prefix + "FLUX")
             ext_table["description"].append(
-                f"Flux in NEID {hdul[0].header["OBS-MODE"]} {fiber} fiber"
+                f"Flux in NEID {hdul[0].header['OBS-MODE']} {fiber} fiber"
             )
 
             ext_table["extension_name"].append(out_prefix + "WAVE")
             ext_table["description"].append(
-                f"Wavelength solution for NEID {hdul[0].header["OBS-MODE"]} {fiber} fiber"
+                f"Wavelength solution for NEID {hdul[0].header['OBS-MODE']} {fiber} fiber"
             )
 
             ext_table["extension_name"].append(out_prefix + "VAR")
             ext_table["description"].append(
-                f"Flux variance in NEID {hdul[0].header["OBS-MODE"]} {fiber} fiber"
+                f"Flux variance in NEID {hdul[0].header['OBS-MODE']} {fiber} fiber"
             )
 
             ext_table["extension_name"].append(out_prefix + "BLAZE")
             ext_table["description"].append(
-                f"Blaze for NEID {hdul[0].header["OBS-MODE"]} {fiber} fiber"
+                f"Blaze for NEID {hdul[0].header['OBS-MODE']} {fiber} fiber"
             )
 
         # Barycentric correction and timing related extensions
