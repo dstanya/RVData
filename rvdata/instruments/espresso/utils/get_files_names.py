@@ -22,7 +22,7 @@ import os
 import rvdata.instruments.espresso.config.config as config
 
 
-def get_files_names(full_path: str, directory_structure: str) -> dict:
+def get_files_names(full_path: str, directory_structure: str, level = 2) -> dict:
     """
     This function retrieves the names of related FITS files based on a given
     file's path and constructs a dictionary containing paths to these files.
@@ -40,96 +40,107 @@ def get_files_names(full_path: str, directory_structure: str) -> dict:
     # Get the directory path and base file name from the full path
     repo_path = os.path.dirname(full_path)
     base_file_name = os.path.basename(full_path)
+    if(level == 2):
+        if directory_structure == "dace":
+            repo_path = repo_path.replace(
+                "ESPRESSORAW/raw", f"ESPRESSODRS/{config.DRS_VERSION}/reduced"
+            )
 
-    if directory_structure == "dace":
-        repo_path = repo_path.replace(
-            "ESPRESSORAW/raw", f"ESPRESSODRS/{config.DRS_VERSION}/reduced"
+        # Construct paths for the S2D and BLAZE FITS files (both A and B versions)
+        s2d_blaze_file_A = os.path.join(
+            repo_path, "r." + base_file_name[:-5] + "_S2D_BLAZE_A.fits"
+        )
+        s2d_blaze_file_B = os.path.join(
+            repo_path, "r." + base_file_name[:-5] + "_S2D_BLAZE_B.fits"
+        )
+        drift_file_B = os.path.join(
+            repo_path, "r." + base_file_name[:-5] + "_DRIFT_MATRIX_B.fits"
+        )
+        telluric_file_A = os.path.join(
+            repo_path, "r." + base_file_name[:-5] + "_S2D_BLAZE_TELL_CORR_A.fits"
+        )
+        skysub_file_A = os.path.join(
+            repo_path, "r." + base_file_name[:-5] + "_S2D_BLAZE_SKYSUB_A.fits"
         )
 
-    # Construct paths for the S2D and BLAZE FITS files (both A and B versions)
-    s2d_blaze_file_A = os.path.join(
-        repo_path, "r." + base_file_name[:-5] + "_S2D_BLAZE_A.fits"
-    )
-    s2d_blaze_file_B = os.path.join(
-        repo_path, "r." + base_file_name[:-5] + "_S2D_BLAZE_B.fits"
-    )
-    drift_file_B = os.path.join(
-        repo_path, "r." + base_file_name[:-5] + "_DRIFT_MATRIX_B.fits"
-    )
-    telluric_file_A = os.path.join(
-        repo_path, "r." + base_file_name[:-5] + "_S2D_BLAZE_TELL_CORR_A.fits"
-    )
-    skysub_file_A = os.path.join(
-        repo_path, "r." + base_file_name[:-5] + "_S2D_BLAZE_SKYSUB_A.fits"
-    )
-
-    if not os.path.isfile(drift_file_B):
-        with fits.open(full_path) as hdu_raw:
-            dpr_type = hdu_raw["PRIMARY"].header["HIERARCH ESO DPR TYPE"]
-            if dpr_type.split(",")[1] == "SKY":
-                print(
-                    "SKY type doesn't have any DRIFT correction, "
-                    "DRIFT extension will be generated with zeros"
-                )
-                drift_file_B = None
-            else:
-                drift_file_B = None
-                print(
-                    "No DRIFT_MATRIX_B file found, "
-                    "DRIFT extension will be generated with zeros"
-                )
-
-    # Open the S2D BLAZE FITS file (A version) to retrieve the BLAZE file names
-    # These names are stored in specific header fields: ESO PRO REC1 CALn NAME
-    # On Windows, ":" in file names is replaced with "_" as ":" is not allowed
-    # in Windows file systems.
-    with fits.open(s2d_blaze_file_A) as hdul:
-        for i in hdul["PRIMARY"].header["ESO PRO REC1 CAL* CATG"]:
-            if "BLAZE_A" == hdul["PRIMARY"].header[i]:
-                if os.name == "nt":
-                    # For Windows: Replace ":" with "_" in file names
-                    blaze_file_A = adjust_repo_path(
-                        repo_path,
-                        hdul["PRIMARY"].header[i[:-4] + "NAME"].replace(":", "_"),
-                        directory_structure,
+        if not os.path.isfile(drift_file_B):
+            with fits.open(full_path) as hdu_raw:
+                dpr_type = hdu_raw["PRIMARY"].header["HIERARCH ESO DPR TYPE"]
+                if dpr_type.split(",")[1] == "SKY":
+                    print(
+                        "SKY type doesn't have any DRIFT correction, "
+                        "DRIFT extension will be generated with zeros"
                     )
+                    drift_file_B = None
                 else:
-                    # For non-Windows systems: Use file names as they are
-                    blaze_file_A = adjust_repo_path(
-                        repo_path,
-                        hdul["PRIMARY"].header[i[:-4] + "NAME"],
-                        directory_structure,
+                    drift_file_B = None
+                    print(
+                        "No DRIFT_MATRIX_B file found, "
+                        "DRIFT extension will be generated with zeros"
                     )
 
-            if "BLAZE_B" == hdul["PRIMARY"].header[i]:
-                if os.name == "nt":
-                    # For Windows: Replace ":" with "_" in file names
-                    blaze_file_B = adjust_repo_path(
-                        repo_path,
-                        hdul["PRIMARY"].header[i[:-4] + "NAME"].replace(":", "_"),
-                        directory_structure,
-                    )
-                else:
-                    # For non-Windows systems: Use file names as they are
-                    blaze_file_B = adjust_repo_path(
-                        repo_path,
-                        hdul["PRIMARY"].header[i[:-4] + "NAME"],
-                        directory_structure,
-                    )
+        # Open the S2D BLAZE FITS file (A version) to retrieve the BLAZE file names
+        # These names are stored in specific header fields: ESO PRO REC1 CALn NAME
+        # On Windows, ":" in file names is replaced with "_" as ":" is not allowed
+        # in Windows file systems.
+        with fits.open(s2d_blaze_file_A) as hdul:
+            for i in hdul["PRIMARY"].header["ESO PRO REC1 CAL* CATG"]:
+                if "BLAZE_A" == hdul["PRIMARY"].header[i]:
+                    if os.name == "nt":
+                        # For Windows: Replace ":" with "_" in file names
+                        blaze_file_A = adjust_repo_path(
+                            repo_path,
+                            hdul["PRIMARY"].header[i[:-4] + "NAME"].replace(":", "_"),
+                            directory_structure,
+                        )
+                    else:
+                        # For non-Windows systems: Use file names as they are
+                        blaze_file_A = adjust_repo_path(
+                            repo_path,
+                            hdul["PRIMARY"].header[i[:-4] + "NAME"],
+                            directory_structure,
+                        )
 
-    # Construct a dictionary of all the file paths
-    # `full_path` corresponds to the raw file path (the input to this function)
-    names = {
-        "raw_file": full_path,
-        "s2d_blaze_file_A": s2d_blaze_file_A,
-        "s2d_blaze_file_B": s2d_blaze_file_B,
-        "blaze_file_A": blaze_file_A,
-        "blaze_file_B": blaze_file_B,
-        "drift_file_B": drift_file_B,
-        "telluric_file_A": telluric_file_A,
-        "skysub_file_A": skysub_file_A,
-    }
-    return names
+                if "BLAZE_B" == hdul["PRIMARY"].header[i]:
+                    if os.name == "nt":
+                        # For Windows: Replace ":" with "_" in file names
+                        blaze_file_B = adjust_repo_path(
+                            repo_path,
+                            hdul["PRIMARY"].header[i[:-4] + "NAME"].replace(":", "_"),
+                            directory_structure,
+                        )
+                    else:
+                        # For non-Windows systems: Use file names as they are
+                        blaze_file_B = adjust_repo_path(
+                            repo_path,
+                            hdul["PRIMARY"].header[i[:-4] + "NAME"],
+                            directory_structure,
+                        )
+
+        # Construct a dictionary of all the file paths
+        # `full_path` corresponds to the raw file path (the input to this function)
+        names = {
+            "raw_file": full_path,
+            "s2d_blaze_file_A": s2d_blaze_file_A,
+            "s2d_blaze_file_B": s2d_blaze_file_B,
+            "blaze_file_A": blaze_file_A,
+            "blaze_file_B": blaze_file_B,
+            "drift_file_B": drift_file_B,
+            "telluric_file_A": telluric_file_A,
+            "skysub_file_A": skysub_file_A,
+        }
+        return names
+    elif(level == 3):
+        print("Level 3 conversion is not implemented yet.")
+        return None
+    elif(level == 4):
+        names = {
+            "raw_file": full_path,
+            "ccf_file": os.path.join(repo_path, "r." + base_file_name[:-5] + "_CCF_A.fits"),
+            "ccf_tel_corr_file": os.path.join(repo_path, "r." + base_file_name[:-5] + "_CCF_TELL_CORR_A.fits"),
+        }
+        return names
+
 
 
 def adjust_repo_path(

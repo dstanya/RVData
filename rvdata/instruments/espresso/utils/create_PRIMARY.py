@@ -90,7 +90,6 @@ def create_PRIMARY(RV2: RV2, names: list[str], nb_trace: int, nb_slice: int) -> 
         ]
     elif "TELESCOP" in RV2.headers["INSTRUMENT_HEADER"]:
         front_end_id = RV2.headers["INSTRUMENT_HEADER"]["TELESCOP"][-1]
-
     header_map["ESO_keyword"] = header_map["ESO_keyword"].str.replace(
         "%UT%", front_end_id
     )
@@ -400,15 +399,21 @@ def create_PRIMARY(RV2: RV2, names: list[str], nb_trace: int, nb_slice: int) -> 
         )
 
     # EXSNRW-N KEYWORD
+    table_order = pd.read_csv(os.path.join(base_dir, "config", "table_order.csv"))
     for i in range(int(l2_hdu.header["NUMORDER"])):
+        # Previous version, now using the table_order table
+        # l2_hdu.header[f"EXSNRW{str(i+1)}"] = (
+        #     round(
+        #         RV2.data["TRACE1_WAVE"][i, 0]
+        #         + (RV2.data["TRACE1_WAVE"][i, -1] - RV2.data["TRACE1_WAVE"][i, 0]) / 2
+        #     ),
+        #     header_map[header_map["Keyword"] == "EXSNRW"]["Description"].iloc[0],
+        # )
+        # We take each value twice to account for the slices
         l2_hdu.header[f"EXSNRW{str(i+1)}"] = (
-            round(
-                RV2.data["TRACE1_WAVE"][i, 0]
-                + (RV2.data["TRACE1_WAVE"][i, -1] - RV2.data["TRACE1_WAVE"][i, 0]) / 2
-            ),
+            table_order.iloc[math.floor(i/2)]["Central_wav[nm]"].astype('float')*10,
             header_map[header_map["Keyword"] == "EXSNRW"]["Description"].iloc[0],
         )
-
     # DRPFLAG KEYWORD
     drp_flag = RV2.headers["INSTRUMENT_HEADER"][
         header_map[header_map["Keyword"] == "DRPFLAG"]["ESO_keyword"].iloc[0]
