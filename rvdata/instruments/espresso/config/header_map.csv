@@ -2,7 +2,7 @@ Keyword,ESO_keyword,value,Extension,from,comment,skip,Description,default_value
 INSTRUME,INSTRUME,,PRIMARY,S2D_BLAZE_A,,False,Instrument name,UNKNOWN
 ORGANIZA,,ESO,PRIMARY,S2D_BLAZE_A,,False,Organization the data belongs to,Null
 ORIGIN,ORIGIN,,PRIMARY,,,False,Institution that created this file,Null
-DATALVL,,L2,PRIMARY,,,False,Data Product Base Level,UNKNOWN
+DATALVL,,,PRIMARY,,,False,Data Product Base Level,UNKNOWN
 OBSERVER,,UNKNOWN,PRIMARY,,,False,Observer,UNKNOWN
 PROGRAM,HIERARCH ESO OBS PROG ID,,PRIMARY,S2D_BLAZE_A,,False,Observing program name,Null
 PINAME,PI-COI,,PRIMARY,S2D_BLAZE_A,,False,Program PI Name,Null

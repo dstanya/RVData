@@ -40,11 +40,11 @@ def get_files_names(full_path: str, directory_structure: str, level = 2) -> dict
     # Get the directory path and base file name from the full path
     repo_path = os.path.dirname(full_path)
     base_file_name = os.path.basename(full_path)
+    if directory_structure == "dace":
+        repo_path = repo_path.replace(
+            "ESPRESSORAW/raw", f"ESPRESSODRS/{config.DRS_VERSION}/reduced"
+        )
     if(level == 2):
-        if directory_structure == "dace":
-            repo_path = repo_path.replace(
-                "ESPRESSORAW/raw", f"ESPRESSODRS/{config.DRS_VERSION}/reduced"
-            )
 
         # Construct paths for the S2D and BLAZE FITS files (both A and B versions)
         s2d_blaze_file_A = os.path.join(
@@ -138,6 +138,7 @@ def get_files_names(full_path: str, directory_structure: str, level = 2) -> dict
             "raw_file": full_path,
             "ccf_file": os.path.join(repo_path, "r." + base_file_name[:-5] + "_CCF_A.fits"),
             "ccf_tel_corr_file": os.path.join(repo_path, "r." + base_file_name[:-5] + "_CCF_TELL_CORR_A.fits"),
+            "ccf_sky_file": os.path.join(repo_path, "r." + base_file_name[:-5] + "_CCF_SKYSUB_A.fits"),
         }
         return names
 

@@ -20,6 +20,7 @@ from rvdata.instruments.espresso.utils import (
     get_files_names,
     create_PRIMARY,
     validate_fits_file,
+    convert_CCF
 )
 
 # ESPRESSO Level4 Reader
@@ -116,7 +117,6 @@ class ESPRESSORV4(RV4):
 
         :noindex:
         """
-
         path = os.path.join(self.dirname, self.filename)
         # Validate the FITS file before conversion. If it does not meet the
         # criteria, raise an error
@@ -127,12 +127,11 @@ class ESPRESSORV4(RV4):
             raise ValueError(e)
 
         # Retrieve the paths for the necessary files
-        names = get_files_names(path, directory_structure, level = 4)
+        names = get_files_names(path, directory_structure, level=4)
+        print(names)
         trace_ind_start = 1
         with fits.open(names['ccf_file']) as hdul_ccf:
             self.set_header("INSTRUMENT_HEADER", hdul_ccf["PRIMARY"].header)
-        with fits.open(path) as hdu_raw:
-            dpr_type = hdu_raw["PRIMARY"].header["HIERARCH ESO DPR TYPE"].split(",")[1]
         # -> TODO: Do we want to also store the telcorr CCF?
         # try:
         #     convert_TELLURIC(
@@ -151,20 +150,12 @@ class ESPRESSORV4(RV4):
         
 
         
-        trace_ind_start += config.slice_nb
-
+        trace_ind_start += 2
         # Create the PRIMARY header
         nb_trace = config.slice_nb
-        create_PRIMARY(self, names, nb_trace, config.slice_nb)
+        create_PRIMARY(self, names, nb_trace, config.slice_nb, level = 4)
+        convert_CCF(self, names)
         return
 
         
-    def convert_RV(self):
-        pass
-
-    def convert_CCF(self):
-        pass
-
-    def convert_DIAGNOSTICS(self):
-
-        pass
+    

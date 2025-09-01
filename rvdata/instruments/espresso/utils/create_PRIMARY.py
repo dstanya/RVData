@@ -41,7 +41,7 @@ import rvdata.instruments.espresso.config.config as config
 from rvdata.core.models.level2 import RV2
 
 
-def create_PRIMARY(RV2: RV2, names: list[str], nb_trace: int, nb_slice: int) -> None:
+def create_PRIMARY(RV2: RV2, names: list[str], nb_trace: int, nb_slice: int, level:int = 2) -> None:
     """
     Create the PRIMARY HDU for the L2 FITS file by copying relevant metadata
     from different files and applying necessary transformations.
@@ -68,7 +68,7 @@ def create_PRIMARY(RV2: RV2, names: list[str], nb_trace: int, nb_slice: int) -> 
     - If a keyword value is missing in the source file, it is set to `Null`.
     - Special handling is applied for some keyword.
     """
-
+    print(nb_trace, nb_slice)
     # We create an empty HDU to store the L2 Primary header
     l2_hdu = fits.PrimaryHDU(data=None)
     l2_hdu.header["EXTNAME"] = "PRIMARY"
@@ -227,7 +227,8 @@ def create_PRIMARY(RV2: RV2, names: list[str], nb_trace: int, nb_slice: int) -> 
         "CZ",
         "CCLR",
     ]
-
+    # Setting datalvl keyword
+    l2_hdu.header['DATALVL'] = (f'L{level}', header_map[header_map["Keyword"] == "DATALVL"]["Description"].iloc[0])
     with fits.open(names["raw_file"]) as hdu_raw:
         dpr_type = hdu_raw["PRIMARY"].header["HIERARCH ESO DPR TYPE"].split(",")
         for i in range(1, nb_trace + 1):

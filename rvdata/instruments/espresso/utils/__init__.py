@@ -9,7 +9,7 @@ from .validate_fits_file import validate_fits_file
 from .convert_RAW import convert_RAW
 from .convert_TELLURIC import convert_TELLURIC
 from .convert_SKYSUB import convert_SKYSUB
-
+from .convert_CCF import convert_CCF
 __all__ = [
     "convert_BLAZE",
     "convert_DRIFT",
@@ -20,4 +20,5 @@ __all__ = [
     "convert_RAW",
     "convert_TELLURIC",
     "convert_SKYSUB",
+    "convert_CCF",
 ]
