@@ -201,7 +201,7 @@ class RVDataModel(object):
                     elif row["Data type"].lower() == "double":
                         self.headers["PRIMARY"][key] = np.float64(value)
                     else:
-                        warnings.warn(f"Unknown type {row['Type']} for keyword {key}")
+                        warnings.warn(f"Unknown type {row['Data type']} for keyword {key}")
                 except (TypeError, AttributeError, ValueError):
                     warnings.warn(
                         f"Cannot convert value {value} for keyword {key} to type {row['Data type']}"
