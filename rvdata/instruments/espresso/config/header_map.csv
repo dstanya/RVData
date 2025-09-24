@@ -59,7 +59,7 @@ MOONANG,,,PRIMARY,,,True,[deg] Target-Moon Angle,Null
 MOONEL,,,PRIMARY,,,True,[deg] Moon Elevation Angle,Null
 MOONILLU,,,PRIMARY,,,True,[%] Moon illumination,Null
 MOONRV,,,PRIMARY,,,True,[km/s] RV of reflected sunlight off moon,Null
-INHUM,,Null,,,,False,[%] Relative humidity inside dome,Null
+INHUM,,Null,,,,True,[%] Relative humidity inside dome,Null
 INHUMT,,Null,,,,False,INHUM timestamp,Null
 OUTTMP,HIERARCH ESO TEL%UT% AMBI TEMP,,PRIMARY,S2D_BLAZE_A,,False,[C] Outside temperature,Null
 OUTTMPT,,Null,,,,False,OUTTMP timestamp,Null

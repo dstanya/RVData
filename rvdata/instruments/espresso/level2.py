@@ -142,15 +142,17 @@ class ESPRESSORV2(RV2):
 
         with fits.open(path) as hdu_raw:
             dpr_type = hdu_raw["PRIMARY"].header["HIERARCH ESO DPR TYPE"].split(",")[1]
+            slice_nb = config.slice_nb[hdu_raw['PRIMARY'].header['HIERARCH ESO INS MODE']]
+            
         fibers = config.fiber.get(dpr_type, {})
         convert_RAW(self, path)
 
         for fiber in fibers:
             convert_S2D_BLAZE(
-                self, names["s2d_blaze_file_" + fiber], trace_ind_start, config.slice_nb
+                self, names["s2d_blaze_file_" + fiber], trace_ind_start, slice_nb
             )
             convert_BLAZE(
-                self, names["blaze_file_" + fiber], trace_ind_start, config.slice_nb
+                self, names["blaze_file_" + fiber], trace_ind_start, slice_nb
             )
             if fiber == "A":
                 try:
@@ -158,7 +160,7 @@ class ESPRESSORV2(RV2):
                         self,
                         names["telluric_file_" + fiber],
                         trace_ind_start,
-                        config.slice_nb,
+                        slice_nb,
                     )
                     print("TRACEi_TELLURIC_x extensions " "have been generated.")
                 except Exception:
@@ -172,7 +174,7 @@ class ESPRESSORV2(RV2):
                         self,
                         names["skysub_file_" + fiber],
                         trace_ind_start,
-                        config.slice_nb,
+                        slice_nb,
                     )
                     print("TRACEi_SKYSUB_x extensions " "have been generated.")
                 except Exception:
@@ -183,15 +185,15 @@ class ESPRESSORV2(RV2):
 
             if fiber == "B":
                 convert_DRIFT(
-                    self, names["drift_file_" + fiber], trace_ind_start, config.slice_nb
+                    self, names["drift_file_" + fiber], trace_ind_start, slice_nb
                 )
 
-            trace_ind_start += config.slice_nb
+            trace_ind_start += slice_nb
 
         # Create the PRIMARY header
         nb_fiber = len(fibers)
-        nb_trace = nb_fiber * config.slice_nb
-        create_PRIMARY(self, names, nb_trace, config.slice_nb)
+        nb_trace = nb_fiber * slice_nb
+        create_PRIMARY(self, names, nb_trace, slice_nb)
 
         # Filling the EXT_DESCRIPT and ORDER_TABLE extensions
         try:

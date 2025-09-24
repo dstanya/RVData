@@ -26,7 +26,12 @@ from astropy.coordinates import (
     EarthLocation,
     AltAz,
     get_body,
+    get_sun,
+    Angle,
     get_body_barycentric_posvel,
+    solar_system_ephemeris,
+    ICRS,
+    GCRS
 )
 from astropy import units as u
 from astroquery.simbad import Simbad
@@ -68,7 +73,6 @@ def create_PRIMARY(RV2: RV2, names: list[str], nb_trace: int, nb_slice: int, lev
     - If a keyword value is missing in the source file, it is set to `Null`.
     - Special handling is applied for some keyword.
     """
-    print(nb_trace, nb_slice)
     # We create an empty HDU to store the L2 Primary header
     l2_hdu = fits.PrimaryHDU(data=None)
     l2_hdu.header["EXTNAME"] = "PRIMARY"
@@ -83,22 +87,27 @@ def create_PRIMARY(RV2: RV2, names: list[str], nb_trace: int, nb_slice: int, lev
     header_map = pd.read_csv(header_map_path)
 
     # We replace the %UT% in the header map with the front end ID to get the
-    # correct keywords depending on which UT was used
-    if "HIERARCH ESO OCS ENABLED FE" in RV2.headers["INSTRUMENT_HEADER"]:
-        front_end_id = RV2.headers["INSTRUMENT_HEADER"]["HIERARCH ESO OCS ENABLED FE"][
-            0
-        ]
-    elif "TELESCOP" in RV2.headers["INSTRUMENT_HEADER"]:
-        front_end_id = RV2.headers["INSTRUMENT_HEADER"]["TELESCOP"][-1]
-    header_map["ESO_keyword"] = header_map["ESO_keyword"].str.replace(
-        "%UT%", front_end_id
-    )
-    # TODO
-    # #Special case for UT1
-    # if RV2.UT == '1':
-    #     header_map['ESO_keyword'] = header_map['ESO_keyword']
-    #       .str.replace('INS1', 'INS')
 
+    # These keywords change based on which UT is active
+    multi_UTs_keywords = [
+        'HIERARCH ESO TEL%UT% GEOLON',
+        'HIERARCH ESO TEL%UT% GEOLAT',
+        'HIERARCH ESO TEL%UT% AMBI FWHM START',
+        'HIERARCH ESO TEL%UT% ALT',
+        'HIERARCH ESO TEL%UT% PARANG START',
+        'HIERARCH ESO TEL%UT% PARANG END',
+        'HIERARCH ESO ADA%UT% ABSROT END'
+    ]
+    active_UTs = [str(c) for c in [1,2,3,4] if RV2.headers['INSTRUMENT_HEADER'][f'HIERARCH ESO OCS TEL{c} ST']]
+    if (len(active_UTs) == 1):
+        header_map["ESO_keyword"] = header_map["ESO_keyword"].str.replace(
+            "%UT%", active_UTs[0]
+        )
+    else:
+        # We assign one UT value to the keywords that remain the same even when multiple UTs
+        # are active
+        header_map['ESO_keyword'] = [c.replace("%UT%", active_UTs[0]) if 
+                                     ("%UT%" in str(c) and c not in multi_UTs_keywords) else c for c in header_map['ESO_keyword']]
     # We iterate through the header_map file to translate each keyword.
     for index, values in header_map.iterrows():
         # If the keyword has its skip value set to True, it is not copied
@@ -123,12 +132,21 @@ def create_PRIMARY(RV2: RV2, names: list[str], nb_trace: int, nb_slice: int, lev
             # Otherwise, we copy the value from the good file
             elif pd.notna(header_map["ESO_keyword"].iloc[index]):
                 if header_map["from"].iloc[index] == "S2D_BLAZE_A":
-                    l2_hdu.header[values.iloc[0]] = (
-                        RV2.headers["INSTRUMENT_HEADER"][
-                            header_map["ESO_keyword"].iloc[index]
-                        ],
-                        header_map["Description"].iloc[index],
-                    )
+                    if(len(active_UTs) > 1 and header_map["ESO_keyword"].iloc[index] in multi_UTs_keywords):
+                        for ut in active_UTs:
+                            l2_hdu.header[f'{values.iloc[0]}{ut}'] = (
+                            RV2.headers["INSTRUMENT_HEADER"][
+                                header_map["ESO_keyword"].iloc[index].replace("%UT%", ut)
+                            ],
+                            header_map["Description"].iloc[index]+' for UT'+ut,
+                        )
+                    else:
+                        l2_hdu.header[values.iloc[0]] = (
+                            RV2.headers["INSTRUMENT_HEADER"][
+                                header_map["ESO_keyword"].iloc[index]
+                            ],
+                            header_map["Description"].iloc[index],
+                        )
                 elif header_map["from"].iloc[index] == "RAW":
                     with fits.open(names["raw_file"]) as hdu_raw:
                         l2_hdu.header[values.iloc[0]] = (
@@ -354,10 +372,17 @@ def create_PRIMARY(RV2: RV2, names: list[str], nb_trace: int, nb_slice: int, lev
     )
 
     # TZA KEYWORD
-    l2_hdu.header["TZA"] = (
-        np.round(90 - l2_hdu.header["TEL"], 3),
-        header_map[header_map["Keyword"] == "TZA"]["Description"].iloc[0],
-    )
+    if(len(active_UTs) == 1):
+        l2_hdu.header["TZA"] = (
+            np.round(90 - l2_hdu.header["TEL"], 3),
+            header_map[header_map["Keyword"] == "TZA"]["Description"].iloc[0],
+        )
+    else:
+        for ut in active_UTs:
+            l2_hdu.header[f'TZA{ut}'] = (
+                np.round(90 - l2_hdu.header[f'TEL{ut}'], 3),
+                header_map[header_map["Keyword"] == "TZA"]["Description"].iloc[0]+' for UT'+ut,
+            )
 
     # THA KEYWORD
     l2_hdu.header["THA"] = (
@@ -366,17 +391,26 @@ def create_PRIMARY(RV2: RV2, names: list[str], nb_trace: int, nb_slice: int, lev
     )
 
     # MOONANG/MOONEL/MOONILLU/MOONRV/SUNEL KEYWORDS
-    moon_sun_params = get_moon_sun_info(
-        RV2.headers["INSTRUMENT_HEADER"]["RA"],
-        RV2.headers["INSTRUMENT_HEADER"]["DEC"],
-        l2_hdu.header["OBSLAT"],
-        l2_hdu.header["OBSLON"],
-        l2_hdu.header["OBSALT"],
-        l2_hdu.header["DATE-OBS"],
-        l2_hdu.header["JD_UTC"],
-    )
+    if(len(active_UTs) == 1):
+        moon_sun_params = get_moon_sun_info(
+            RV2.headers["INSTRUMENT_HEADER"]["RA"],
+            RV2.headers["INSTRUMENT_HEADER"]["DEC"],
+            l2_hdu.header["OBSLAT"],
+            l2_hdu.header["OBSLON"],
+            l2_hdu.header["OBSALT"],
+            l2_hdu.header["JD_UTC"],
+        )
+    else:
+        moon_sun_params = get_moon_sun_info(
+            RV2.headers["INSTRUMENT_HEADER"]["RA"],
+            RV2.headers["INSTRUMENT_HEADER"]["DEC"],
+            l2_hdu.header[f"OBSLAT{active_UTs[0]}"],
+            l2_hdu.header[f"OBSLON{active_UTs[0]}"],
+            l2_hdu.header["OBSALT"],
+            l2_hdu.header["JD_UTC"],
+        )
 
-    # List of corresponding keywords
+    # List of corresponding keywords§
     moon_sun_keywords = ["SUNEL", "MOONANG", "MOONEL", "MOONILLU", "MOONRV"]
 
     # Assign values to headers dynamically
@@ -395,7 +429,7 @@ def create_PRIMARY(RV2: RV2, names: list[str], nb_trace: int, nb_slice: int, lev
     # EXSNR-N KEYWORD
     for i in range(1, int(l2_hdu.header["NUMORDER"]) + 1):
         l2_hdu.header[f"EXSNR{str(i)}"] = (
-            RV2.headers["INSTRUMENT_HEADER"][f"HIERARCH ESO QC ORDER{str(i*2-1)} SNR"],
+            RV2.headers["INSTRUMENT_HEADER"][f"HIERARCH ESO QC ORDER{str(i*nb_slice-nb_slice//2)} SNR"],
             header_map[header_map["Keyword"] == "EXSNR"]["Description"].iloc[0],
         )
 
@@ -709,7 +743,6 @@ def get_moon_sun_info(
     obs_lat: float,
     obs_lon: float,
     obs_alt: float,
-    obs_time: str,
     jd_utc: float,
 ) -> list:
     """
@@ -724,8 +757,6 @@ def get_moon_sun_info(
         obs_lat (float): Latitude of the observation location in degrees.
         obs_lon (float): Longitude of the observation location in degrees.
         obs_alt (float): Altitude of the observation location in meters.
-        obs_time (str): Observation time in ISO format
-            (e.g., 'YYYY-MM-DD HH:MM:SS').
         jd_utc (float): Julian Date (UTC) for the observation.
 
     Returns:
@@ -741,86 +772,42 @@ def get_moon_sun_info(
                 moon (in km/s).
     """
 
-    # Observer's location and observation time
-    location = EarthLocation(lat=obs_lat, lon=obs_lon, height=obs_alt)
-    time = Time(obs_time)
+    t_obs = Time(jd_utc, format='jd', scale='utc')
+    loc = EarthLocation(lat=obs_lat, lon=obs_lon, height=obs_alt)
+    coords = SkyCoord(target_ra,target_dec, frame='icrs', unit='deg')
+    star_icrs= SkyCoord(coords, frame=ICRS, unit=(u.hourangle, u.deg))
 
-    # Get the Moon's position at the given time and location (GCRS)
-    moon_coord = get_body("moon", time, location=location)
+    with solar_system_ephemeris.set('jpl'):
+        gcrs_frame = GCRS(obstime=t_obs, obsgeoloc=loc.get_gcrs_posvel(t_obs)[0], obsgeovel=loc.get_gcrs_posvel(t_obs)[1])
+        star_coord_gcrs = star_icrs.transform_to(gcrs_frame)
+        sun_coord_gcrs  = get_sun(t_obs).transform_to(gcrs_frame)
+        moon_coord_gcrs = get_body("moon", t_obs, loc).transform_to(gcrs_frame)
 
-    # We need to convert moon_coord in ICRS to match target_coord ref
-    moon_coord_icrs = moon_coord.transform_to("icrs")
+        moon_altaz = moon_coord_gcrs.transform_to(AltAz(obstime=t_obs, location=loc))
+        moon_el = round(moon_altaz.alt.deg, 4)
+        sun_altaz = sun_coord_gcrs.transform_to(AltAz(obstime=t_obs, location=loc))
+        sun_el = sun_altaz.alt.deg
 
-    # Target's position
-    target_coord = SkyCoord(
-        ra=target_ra, dec=target_dec, frame="icrs", unit="deg", obstime=time
-    )
+        elongation = sun_coord_gcrs.separation(moon_coord_gcrs)
+        moon_phase_angle = np.arctan2(sun_coord_gcrs.distance*np.sin(elongation), moon_coord_gcrs.distance - sun_coord_gcrs.distance*np.cos(elongation))
+        IlluminatedMoonFraction = (1 + np.cos(moon_phase_angle))/2.0
+        moonStarSep_deg = Angle(moon_coord_gcrs.separation(star_coord_gcrs)).degree
+        xSunBary_km, vSunBary_kmpd = get_body_barycentric_posvel('sun', t_obs)     
+        vSunBary_kmps = vSunBary_kmpd.xyz.to(u.m/u.s) 
+        xEarthBary_km, vEarthBary_kmpd = get_body_barycentric_posvel('earth', t_obs)
+        vEarthBary_kmps = vEarthBary_kmpd.xyz.to(u.km/u.s)
+        xMoonBary_km, vMoonBary_kmpd = get_body_barycentric_posvel('moon', t_obs)
+        vMoonBary_kmps = vMoonBary_kmpd.xyz.to(u.km/u.s)
 
-    # Calculate the angular separation between the target and the Moon
-    moon_ang = round(moon_coord_icrs.separation(target_coord).deg, 4)
+        uMoonSun=(xMoonBary_km - xSunBary_km)/(xMoonBary_km - xSunBary_km).norm()
+        dvMoonSun_kmps = vMoonBary_kmps - vSunBary_kmps
+        ProjVelMoonSun_kmps=dvMoonSun_kmps.dot(uMoonSun.get_xyz())
 
-    # Calculate the Moon's elevation above the horizon
-    # (GCRS here but could be ICRS, no impact)
-    moon_altaz = moon_coord.transform_to(AltAz(obstime=time, location=location))
-    moon_el = round(moon_altaz.alt.deg, 4)
+        uEarthMoon=(xEarthBary_km - xMoonBary_km)/(xEarthBary_km - xMoonBary_km).norm()
+        dvEarthMoon_kmps =  vEarthBary_kmps - vMoonBary_kmps
+        ProjVelEarthMoon_kmps=dvEarthMoon_kmps.dot(uEarthMoon.get_xyz())
 
-    # Get the Sun's position and transform it to the observer's AltAz frame
-    sun = get_body("sun", time, location=location)
+        vel_moon_kmps = ProjVelEarthMoon_kmps + ProjVelMoonSun_kmps
+        berv1_Target_astropy = coords.radial_velocity_correction(obstime=t_obs, location=loc).to('km/s')
 
-    sun_altaz = sun.transform_to(AltAz(obstime=time, location=location))
-    sun_el = sun_altaz.alt.deg
-
-    # Calculate the Moon's illumination
-    elongation = moon_coord.separation(sun)
-    moon_phase_angle = np.arctan2(
-        sun.distance * np.sin(elongation),
-        moon_coord.distance - sun.distance * np.cos(elongation),
-    )
-    moon_illu = round((1 + np.cos(moon_phase_angle).value) / 2 * 100, 4)
-
-    # Calculate the RV of reflected sunlight off moon
-    moon_rv = round(
-        get_moon_velocity_in_target_direction(target_ra, target_dec, jd_utc), 4
-    )
-
-    return [sun_el, moon_ang, moon_el, moon_illu, moon_rv]
-
-
-def get_moon_velocity_in_target_direction(
-    alpha_deg: float, delta_deg: float, julian_day: float
-) -> float:
-    """
-    Compute the velocity of the Moon projected in the direction of a given
-    target in the sky.
-
-    Parameters:
-        alpha_deg (float): Right Ascension (RA) of the target in degrees.
-        delta_deg (float): Declination (Dec) of the target in degrees.
-        julian_day (float): Julian date for the calculation.
-
-    Returns:
-        projected_velocity_km_s (float): Radial velocity of the Moon in km/s
-            in the target direction.
-    """
-
-    # Convert Julian Day to Astropy Time object
-    t = Time(julian_day, format="jd")
-
-    # Get the Moon's barycentric position & velocity (in AU and AU/day)
-    # using JPL ephemeris
-    moon_pos, moon_vel = get_body_barycentric_posvel("moon", t, ephemeris="jpl")
-
-    # Extract velocity components (AU/day)
-    x_vel, y_vel, z_vel = moon_vel.xyz.to_value(u.km / u.s)
-
-    # Convert target coordinates (RA, Dec) to radians
-    alpha_rad = np.deg2rad(alpha_deg)
-    delta_rad = np.deg2rad(delta_deg)
-
-    # Compute projected radial velocity
-    projected_velocity_km_s = (
-        x_vel * np.cos(alpha_rad) * np.cos(delta_rad)
-        + y_vel * np.sin(alpha_rad) * np.cos(delta_rad)
-        + z_vel * np.sin(delta_rad))
-
-    return projected_velocity_km_s
+        return [sun_el, moonStarSep_deg, moon_el, IlluminatedMoonFraction.value, vel_moon_kmps.value]

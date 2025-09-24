@@ -13,7 +13,11 @@ EXCLUDE_PROGRAMS = {}
 fiber = {"FP": {"A": "SCI", "B": "FP"}, "SKY": {"A": "SCI", "B": "SKY"}}
 
 # Number of slices in a fiber
-slice_nb = 2
+slice_nb = {
+    'MULTIMR': 1,
+    'SINGLEHR': 2,
+    'SINGLEUHR': 2
+}
 
 # Number of pixels per order
 num_pixel = 9211
@@ -28,16 +32,15 @@ DRS_VERSION = "DRS-3.3.10"
 
 # Allows the conversion of the RAW file
 extnames_raw = {
-    "Exp Meter bin table": {"name": "EXPMETER", "type": "BinTableHDU"},
-    "FS1INT": {"name": "GUIDINGIMAGE", "type": "ImageHDU"},
-    "PS1": {"name": "PUPILIMAGE", "type": "ImageHDU"},
+    "FS%UT%INT": {"name": "GUIDINGIMAGE", "type": "ImageHDU"},
+    "PS%UT%": {"name": "PUPILIMAGE", "type": "ImageHDU"},
 }
 
 # Allows the conversion of TELLURIC files
 extnames_telluric = {
-    "SCIDATA": "_TELLURIC_FLUX",
-    "ERRDATA": "_TELLURIC_VAR",
-    "QUALDATA": "_TELLURIC_QUALDATA",
+    "SCIDATA": "_TELL_COR_FLUX",
+    "ERRDATA": "_TELL_COR_VAR",
+    "QUALDATA": "_TELL_COR_QUALDATA",
 }
 
 # Allows the conversion of SKYSUB files
@@ -61,7 +64,8 @@ TUNIT_FIXES = {"sec": "s", "counts": "count", "ADU": "adu", "days": "d"}
 
 # Define the time ranges of instrument versions
 INSTRUMENT_VERSIONS = [
-    {"version": "ESPRESSO18", "start_date": "2017-11-27", "end_date": "2019-06-14"},
+    {"version": "ESPRESSO18", "start_date": "2017-11-27",
+     "end_date": "2019-06-14"},
     {
         "version": "ESPRESSO19",
         "start_date": "2019-06-24",

@@ -128,8 +128,6 @@ class ESPRESSORV4(RV4):
 
         # Retrieve the paths for the necessary files
         names = get_files_names(path, directory_structure, level=4)
-        print(names)
-        trace_ind_start = 1
         with fits.open(names['ccf_file']) as hdul_ccf:
             self.set_header("INSTRUMENT_HEADER", hdul_ccf["PRIMARY"].header)
         # -> TODO: Do we want to also store the telcorr CCF?
@@ -147,13 +145,9 @@ class ESPRESSORV4(RV4):
         #         "will not be generated."
         #     )
 
-        
-
-        
-        trace_ind_start += 2
         # Create the PRIMARY header
-        nb_trace = config.slice_nb
-        create_PRIMARY(self, names, nb_trace, config.slice_nb, level = 4)
+        nb_trace = 2
+        create_PRIMARY(self, names, nb_trace, 1, level = 4)
         convert_CCF(self, names)
         return
 
