@@ -35,10 +35,17 @@ CZ1 ... CZ#,Catalog Z for for object in trace 1 to #,N/A,Float,0.00000454,'',N,"
 CCLRN1 ... CCLRN#,Catalog color 1 - color 2 name for object in trace 1 to #,N/A,String,"Gaia B-R",'',N,"Can be expanded to multiple keywords indexed 1 to #"
 CCLR1 ... CCLR#,Catalog color 1 - color 2 for object in trace 1 to #,mag,Float,0.47,'',N,"Can be expanded to multiple keywords indexed 1 to #"
 OBSERVAT,Observatory name,N/A,String,KPNO,UNKNOWN,Y,
-TELESCOP,Telescope name,N/A,String,"VLT-UT1 or LBT SX + DX",UNKNOWN,Y,
-OBSLON,Observatory longitude,deg,Float,-111.600562,UNDEFINED,Y,
-OBSLAT,Observatory latitude,deg,Float,31.958092,UNDEFINED,Y,
-OBSALT,Observatory altitude,meters,Float,2091,UNDEFINED,Y,
+TELESCOP,Telescope name,N/A,String,"ESO-VLT-U1234" "WIYN" or "NEIDSOLARFEED",UNKNOWN,Y,For solar observations - if solarfeed has its own name use that otherwise use an instrument + solarfeed type entry
+NUMTEL,Number of telescopes used in the observation,N/A,UInt,1,UNDEFINED,Y,
+TELEID1 ... TELEID#,Labels for telescopes as indexed in TCS keywords,N/A,String,"ESO-VLT-U1",UNKNOWN,Y,		
+GEOSYS,Coordinate system for observatory / telesccope location,N/A,String,"GRS80",UNKNOWN,Y,																																																					
+OBSLON,Longitude used for barycentric correction,deg,Float,-111.600562,UNDEFINED,Y,Recommend 6 decimal places which is ~1m accuracy
+OBSLAT,Latitude used for barycentric correction,deg,Float,31.958092,UNDEFINED,Y,Recommend 6 decimal places which is ~1m accuracy
+OBSALT,Altitude used for barycentric correction,meters,Float,2091,UNDEFINED,Y,Recommend 6 decimal places which is ~1m accuracy
+OBSGEO-X,Cartesian Coordinate X used for barycentric correction,meters,Float,5327395.964,'',N,geocentric Cartesian triple incarnation of the traditional lat/lon/alt position on earth
+OBSGEO-Y,Cartesian Coordinate Y used for barycentric correction,meters,Float,-1719170.488,'',N,geocentric Cartesian triple incarnation of the traditional lat/lon/alt position on earth
+OBSGEO-Z,Cartesian Coordinate Z used for barycentric correction,meters,Float,3051490.766,'',N,geocentric Cartesian triple incarnation of the traditional lat/lon/alt position on earth
+ISSOLAR,Boolean to indicate if observation is of the sun,N/A,Boolean,FALSE,UNKNOWN,Y,
 SEEING,Seeing at beginning of exposure,arcsec,Float,1.2,'',N,
 AIRMASS,Airmass at center field at beginning of exposure,secZ,Float,1.3,'',N,
 TTIME,TCS-data date/time,UTC,String,"2018-04-26T15:53:13",'',N,
@@ -51,8 +58,8 @@ TEL1 ... TEL#,TCS elevation angle for telescope 1 to #,deg,Float,43.5,'',N,"Can 
 TZA1 ... TZA#,TCS zenith angle for telescope 1 to #,deg,Float,35.5435,'',N,"Can be expanded to multiple keywords indexed 1 to #"
 TAZ1 ... TAZ#,TCS azimuth angle for telescope 1 to #,deg,Float,124.3,'',N,"Can be expanded to multiple keywords indexed 1 to #"
 THA1 ... THA#,TCS hour angle for telescope 1 to #,sexagesimal,String,"-2:34:43.3455",'',N,"Can be expanded to multiple keywords indexed 1 to #"
-PARANG,Parallactic angle at exposure start,deg,Float,175.2,'',N,
-PARANG2,Parallactic angle at exposure end,deg,Float,180.7,'',N,
+PARST1 ... PARST#,Parallactic angle at exposure start for telescope 1 to #,deg,Float,175.2,'',N,"Can be expanded to multiple keywords indexed 1 to #"
+PAREND1 ... PAREND#,Parallactic angle at exposure end for telescope 1 to #,deg,Float,180.7,'',N,"Can be expanded to multiple keywords indexed 1 to #"
 ROTANG,Rotator angle,deg,Float,80.3,'',N,
 SUNEL,Sun Elevation Angle,deg,Float,-18.5,'',N,
 MOONANG,Target-Moon Angle,deg,Float,34.56,'',N,
