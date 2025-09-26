@@ -200,6 +200,8 @@ class RVDataModel(object):
                         self.headers["PRIMARY"][key] = str(value)
                     elif row["Data type"].lower() == "double":
                         self.headers["PRIMARY"][key] = np.float64(value)
+                    elif row["Data type"].lower() == "boolean":
+                        self.headers['PRIMARY'][key] = bool(value)
                     else:
                         warnings.warn(f"Unknown type {row['Type']} for keyword {key}")
                 except (TypeError, AttributeError, ValueError):
