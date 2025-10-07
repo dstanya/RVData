@@ -68,9 +68,9 @@ def convert_RAW(RV2: RV2, file_path: str) -> None:
                 "EXPEMETER extension will not be generated"
             )
 
-
         # Loop through all predefined extensions in config.extnames_raw
-        active_UTs = [str(c) for c in [1,2,3,4] if hdul['PRIMARY'].header[f'HIERARCH ESO OCS TEL{c} ST']]
+        active_UTs = [str(c) for c in [1, 2, 3, 4]
+                      if hdul['PRIMARY'].header[f'HIERARCH ESO OCS TEL{c} ST']]
         for ut in active_UTs:
             for field in config.extnames_raw.keys():
                 field_info = config.extnames_raw.get(field, {})
@@ -83,7 +83,8 @@ def convert_RAW(RV2: RV2, file_path: str) -> None:
 
                     # Create the appropriate HDU type based on field type
                     if field_type == "ImageHDU":
-                        raw_hdu = fits.ImageHDU(data=raw_data, header=hdul[field].header)
+                        raw_hdu = fits.ImageHDU(
+                            data=raw_data, header=hdul[field].header)
                     elif field_type == "BinTableHDU":
                         if field_info.get("name") == "EXPMETER":
                             raw_hdu = fix_tunit_keywords(hdul[field])
@@ -101,7 +102,7 @@ def convert_RAW(RV2: RV2, file_path: str) -> None:
                     # Check if the extension already exists in the RV2 object
                     if raw_hdu.header["EXTNAME"] not in RV2.extensions:
                         # If the extension does not exist, create it
-                        if(len(active_UTs) >1):
+                        if (len(active_UTs) > 1):
                             RV2.create_extension(
                                 ext_name=raw_hdu.header["EXTNAME"]+f"{ut}",
                                 ext_type=field_type,
@@ -117,7 +118,8 @@ def convert_RAW(RV2: RV2, file_path: str) -> None:
                             )
                     else:
                         # If the extension exists, update its data and header
-                        RV2.set_header(raw_hdu.header["EXTNAME"], raw_hdu.header)
+                        RV2.set_header(
+                            raw_hdu.header["EXTNAME"], raw_hdu.header)
                         RV2.set_data(raw_hdu.header["EXTNAME"], raw_hdu.data)
                 except Exception:
                     print(
