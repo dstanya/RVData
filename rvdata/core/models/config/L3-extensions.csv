@@ -16,3 +16,4 @@ HDU,Name,DataType,MinBitDepth,Multiplicity,Required,Description,Comments
 14,COMBINED_STITCHED_CUSTOMCORR1_FLUX,ImageHDU,,True,False,Additional corrections made to COMBINED_STITCHED_CORR_FLUX,This could include additional corrections such as telluric or sky corrections
 15,COMBINED_STITCHED_CUSTOMCORR1_WAVE,ImageHDU,,True,False,Wavelength solution corresponding to COMBINED_STITCHED_CORR_WAVE,Wavelength solution corresponding to the flux array in COMBINED_STITCHED_CUSTOMCORR1_FLUX
 16,COMBINED_STITCHED_CUSTOMCORR1_VAR,ImageHDU,,True,False,Variance corresponding to COMBINED_STITCHED_CORR_VAR,Variance of the COMBINED_STITCHED_CUSTOMCORR1_FLUX flux array
+17,EXT_DESCRIPT,BinTableHDU,,False,True,Table describing contents of each extension,

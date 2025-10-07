@@ -18,16 +18,19 @@ def convert_CCF(RV4: RV4, file_path: str) -> None:
         RV4.headers['PRIMARY']['SYSVEL'] = (0,
                                           'Systemic velocity subtracted from RV')
     # Creating the RV extension
-    convert_RV(RV4, file_path['ccf_file'])
-
+    convert_RV(RV4, file_path['ccf_file'], trace_nb=1)
     # Creating the CCF extension
     add_CCFs(RV4, file_path['ccf_file'])
     # Creating the diagnostic extension
     convert_DIAGNOSTICS(RV4, file_path['ccf_file'])
+    if(os.path.exists(file_path['ccf_file_B'])):
+        convert_RV(RV4, file_path['ccf_file_B'], trace_nb=2)
+        add_CCFs(RV4, file_path['ccf_file_B'], trace_nb=2)
+        convert_DIAGNOSTICS(RV4, file_path['ccf_file_B'], trace_nb=2)
 
     convert_custom_files(RV4, file_path)
 
-def convert_RV(RV4, file_path):
+def convert_RV(RV4, file_path, trace_nb=1):
     with fits.open(file_path) as hdul:
         header = hdul["PRIMARY"].header
         header_ = fits.Header()
@@ -45,11 +48,14 @@ def convert_RV(RV4, file_path):
                 "wave_end": [np.nan],
             }
         )
+        if f'RV{trace_nb}' not in RV4.extensions:
+            RV4.create_extension(ext_name=f'RV{trace_nb}', ext_type='BinTableHDU',
+                                 header=header_, data=tab)
+        else:
+            RV4.set_data(f'RV{trace_nb}', tab)
+            RV4.set_header(f'RV{trace_nb}', header_)
 
-        RV4.set_data('RV1', tab)
-        RV4.set_header('RV1', header_)
-
-def add_CCFs(RV4, file_path):
+def add_CCFs(RV4, file_path, trace_nb=1):
     with fits.open(file_path) as hdul:
         primary_ = hdul["PRIMARY"].header
         ccf_data = hdul['scidata'].data
@@ -61,11 +67,15 @@ def add_CCFs(RV4, file_path):
         ccf_header["CCFMASK"] = (primary_['HIERARCH ESO QC CCF MASK'],
                      primary_.comments['HIERARCH ESO QC CCF MASK'])
         ccf_header['VELNSTEP'] = (ccf_data.shape[1], 'Number of Steps in Velocity Grid')
-        RV4.create_extension(ext_name='CCF1', ext_type='ImageHDU',
+        if f'CCF{trace_nb}' in RV4.extensions:
+            RV4.set_data(f'CCF{trace_nb}', ccf_data)
+            RV4.set_header(f'CCF{trace_nb}', ccf_header)
+        else:
+            RV4.create_extension(ext_name=f'CCF{trace_nb}', ext_type='ImageHDU',
                              data=ccf_data, header=ccf_header)
 
 
-def convert_DIAGNOSTICS(RV4, file_path):
+def convert_DIAGNOSTICS(RV4, file_path, trace_nb=1):
 
     with fits.open(file_path) as hdul:
         header = hdul["primary"].header
@@ -79,7 +89,7 @@ def convert_DIAGNOSTICS(RV4, file_path):
                 }
             diag.append(row)
         diag = pd.DataFrame(diag)
-        RV4.create_extension(ext_name = 'DIAGNOSTICS1', ext_type='BinTableHDU',
+        RV4.create_extension(ext_name = f'DIAGNOSTICS{trace_nb}', ext_type='BinTableHDU',
                              header=None, data=diag,)
 
 

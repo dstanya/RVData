@@ -10,6 +10,7 @@ from .convert_RAW import convert_RAW
 from .convert_TELLURIC import convert_TELLURIC
 from .convert_SKYSUB import convert_SKYSUB
 from .convert_CCF import convert_CCF
+from .convert_S1D import convert_S1D
 __all__ = [
     "convert_BLAZE",
     "convert_DRIFT",

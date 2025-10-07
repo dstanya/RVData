@@ -58,6 +58,11 @@ extnames = {
     "QUALDATA": "_QUALDATA",
     "DLLDATA_VAC_BARY": "_DISP",
 }
+extnames_s1d = {
+    'wavelength': ['STITCHED_CORR_TRACE1_WAVE','COMBINED_STITCHED_CORR_WAVE'],
+    'flux': ['STITCHED_CORR_TRACE1_FLUX','COMBINED_STITCHED_CORR_FLUX'],
+    'error': ['STITCHED_CORR_TRACE1_VAR','COMBINED_STITCHED_CORR_VAR'],
+}
 
 # Allows the correction of TUNIT Keyword
 TUNIT_FIXES = {"sec": "s", "counts": "count", "ADU": "adu", "days": "d"}

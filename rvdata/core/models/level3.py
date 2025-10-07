@@ -13,7 +13,7 @@ import rvdata.core.models.level2
 from rvdata.core.models.definitions import LEVEL3_EXTENSIONS
 
 
-class RV3(rvdata.core.models.level2.RV2):
+class RV3(rvdata.core.models.base.RVDataModel):
     """
     The level 3 RV data. Initialized with empty fields.
     Attributes inherited from RVDataModel, additional attributes below.

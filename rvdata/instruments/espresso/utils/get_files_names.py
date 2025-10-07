@@ -3,8 +3,6 @@ RVData/rvdata/instruments/espresso/utils/get_files_names.py
 
 UNIGE-ESO - EPRV
 Author: Loris JACQUES & Emile FONTANET
-Created: Mon Mar 03 2025
-Last Modified: Mon Mar 24 2025
 Version: 1.0.0
 Description:
 Retrieves related FITS file names based on a given raw file path.
@@ -131,12 +129,19 @@ def get_files_names(full_path: str, directory_structure: str, level = 2) -> dict
         }
         return names
     elif(level == 3):
-        print("Level 3 conversion is not implemented yet.")
-        return None
+        names = {
+            "raw_file": full_path,
+            "s1d_A": os.path.join(repo_path, "r." + base_file_name[:-5] + "_S1D_A.fits"),
+            "s1d_B": os.path.join(repo_path, "r." + base_file_name[:-5] + "_S1D_B.fits"),
+            "s1d_skysub_A": os.path.join(repo_path, "r." + base_file_name[:-5] + "_S1D_SKYSUB_A.fits"),
+            "s1d_tell_corr_A": os.path.join(repo_path, "r." + base_file_name[:-5] + "_S1D_TELL_CORR_A.fits"),
+        }
+        return names
     elif(level == 4):
         names = {
             "raw_file": full_path,
             "ccf_file": os.path.join(repo_path, "r." + base_file_name[:-5] + "_CCF_A.fits"),
+            "ccf_file_B": os.path.join(repo_path, "r." + base_file_name[:-5] + "_CCF_B.fits"),
             "ccf_tel_corr_file": os.path.join(repo_path, "r." + base_file_name[:-5] + "_CCF_TELL_CORR_A.fits"),
             "ccf_sky_file": os.path.join(repo_path, "r." + base_file_name[:-5] + "_CCF_SKYSUB_A.fits"),
         }

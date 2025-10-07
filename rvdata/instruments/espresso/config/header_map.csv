@@ -36,6 +36,8 @@ CZ,CZ,,PRIMARY,CRV,,True,Catalog Z for obj in trace,Null
 CCLR,HIERARCH ESO OCS OBJ BV,,PRIMARY,S2D_BLAZE_A,,True,[mag] Catalog Gaia B-R for obj in trace,Null
 OBSERVAT,ORIGIN,,PRIMARY,S2D_BLAZE_A,,False,Observatory name,UNKNOWN
 TELESCOP,TELESCOP,,PRIMARY,S2D_BLAZE_A,,False,Telescope name,UNKNOWN
+TELEID1,,,PRIMARY,,,True, Labels for telescopes as indexed in TCS keywords, UNKNOWN
+NUMTEL,,,PRIMARY,S2D_BLAZE_A,,True, Number of telescopes used in the observation, UNKNOWN
 OBSLON,HIERARCH ESO TEL%UT% GEOLON,,PRIMARY,S2D_BLAZE_A,,False,[deg] Observatory longitude,UNDEFINED
 OBSLAT,HIERARCH ESO TEL%UT% GEOLAT,,PRIMARY,S2D_BLAZE_A,,False,[deg] Observatory latitude,UNDEFINED
 OBSALT,HIERARCH ESO TEL%UT% GEOELEV,,PRIMARY,S2D_BLAZE_A,,False,[m] Observatory altitude,UNDEFINED
@@ -44,15 +46,15 @@ AIRMASS,HIERARCH ESO TEL%UT% AIRM START,,PRIMARY,S2D_BLAZE_A,,False,[secZ] Airma
 TTIME,DATE-OBS,,PRIMARY,S2D_BLAZE_A,,False,[UTC] TCS-data date/time,Null
 TEQNX,HIERARCH ESO TEL%UT% TARG EQUINOX,,PRIMARY,S2D_BLAZE_A,,False,[yr] TCS equinox,Null
 TEPCH,HIERARCH ESO TEL%UT% TARG EPOCH,,PRIMARY,S2D_BLAZE_A,,False,[yr] TCS epoch,Null
-TLST,LST,,PRIMARY,S2D_BLAZE_A,,True,[sexa] TCS local sidereal time,Null
-TRA,RA,,PRIMARY,S2D_BLAZE_A,,True,[sexa] TCS RA,Null
-TDEC,DEC,,PRIMARY,S2D_BLAZE_A,,True,[sexa] TCS DEC,Null
-TEL,HIERARCH ESO TEL%UT% ALT,,PRIMARY,S2D_BLAZE_A,,False,[deg] TCS elevation angle,Null
-TZA,,,PRIMARY,,,True,[deg] Zenith angle,Null
-TAZ,HIERARCH ESO TEL%UT% AZ,,PRIMARY,S2D_BLAZE_A,,False,[deg] TCS azimuth angle,Null
-THA,,,PRIMARY,,,True,[sexa] TCS hour angle,Null
-PARANG,HIERARCH ESO TEL%UT% PARANG START,,PRIMARY,S2D_BLAZE_A,,False,[deg] Parallactic angle at exposure start,Null
-PARANG2,HIERARCH ESO TEL%UT% PARANG END,,PRIMARY,S2D_BLAZE_A,,False,[deg] Parallactic angle at exposure end,Null
+TLST1,LST,,PRIMARY,S2D_BLAZE_A,,True,[sexa] TCS local sidereal time,Null
+TRA1,RA,,PRIMARY,S2D_BLAZE_A,,True,[sexa] TCS RA,Null
+TDEC1,DEC,,PRIMARY,S2D_BLAZE_A,,True,[sexa] TCS DEC,Null
+TEL1,HIERARCH ESO TEL%UT% ALT,,PRIMARY,S2D_BLAZE_A,,False,[deg] TCS elevation angle,Null
+TZA1,,,PRIMARY,,,True,[deg] Zenith angle,Null
+TAZ1,HIERARCH ESO TEL%UT% AZ,,PRIMARY,S2D_BLAZE_A,,False,[deg] TCS azimuth angle,Null
+THA1,,,PRIMARY,,,True,[sexa] TCS hour angle,Null
+PARST1,HIERARCH ESO TEL%UT% PARANG START,,PRIMARY,S2D_BLAZE_A,,False,[deg] Parallactic angle at exposure start,Null
+PAREND1,HIERARCH ESO TEL%UT% PARANG END,,PRIMARY,S2D_BLAZE_A,,False,[deg] Parallactic angle at exposure end,Null
 ROTANG,HIERARCH ESO ADA%UT% ABSROT END,,PRIMARY,S2D_BLAZE_A,,False,[deg] Rotator angle,Null
 SUNEL,,,PRIMARY,,,True,[deg] Sun Elevation Angle,Null
 MOONANG,,,PRIMARY,,,True,[deg] Target-Moon Angle,Null

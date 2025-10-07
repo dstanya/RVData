@@ -90,8 +90,8 @@ def create_PRIMARY(RV2: RV2, names: list[str], nb_trace: int, nb_slice: int, lev
 
     # These keywords change based on which UT is active
     multi_UTs_keywords = [
-        'HIERARCH ESO TEL%UT% GEOLON',
-        'HIERARCH ESO TEL%UT% GEOLAT',
+        #'HIERARCH ESO TEL%UT% GEOLON',
+        #'HIERARCH ESO TEL%UT% GEOLAT',
         'HIERARCH ESO TEL%UT% AMBI FWHM START',
         'HIERARCH ESO TEL%UT% ALT',
         'HIERARCH ESO TEL%UT% PARANG START',
@@ -99,6 +99,10 @@ def create_PRIMARY(RV2: RV2, names: list[str], nb_trace: int, nb_slice: int, lev
         'HIERARCH ESO ADA%UT% ABSROT END'
     ]
     active_UTs = [str(c) for c in [1,2,3,4] if RV2.headers['INSTRUMENT_HEADER'][f'HIERARCH ESO OCS TEL{c} ST']]
+    for i in range(len(active_UTs)):
+        l2_hdu.header[f'TELEID{str(i+1)}'] = (f'ESO-VLT-U{active_UTs[i]}', 'Labels for telescopes as indexed in TCS keywords')
+    l2_hdu.header['NUMTEL'] = (len(active_UTs), 'Number of telescopes used in the observation')
+
     if (len(active_UTs) == 1):
         header_map["ESO_keyword"] = header_map["ESO_keyword"].str.replace(
             "%UT%", active_UTs[0]
@@ -129,12 +133,18 @@ def create_PRIMARY(RV2: RV2, names: list[str], nb_trace: int, nb_slice: int, lev
                     header_map["Description"].iloc[index],
                 )
 
+                
             # Otherwise, we copy the value from the good file
             elif pd.notna(header_map["ESO_keyword"].iloc[index]):
                 if header_map["from"].iloc[index] == "S2D_BLAZE_A":
                     if(len(active_UTs) > 1 and header_map["ESO_keyword"].iloc[index] in multi_UTs_keywords):
                         for ut in active_UTs:
-                            l2_hdu.header[f'{values.iloc[0]}{ut}'] = (
+                            l2_key = values.iloc[0]
+                            if(l2_key[-1] == '1'):
+                                l2_key = l2_key[:-1] + ut
+                            else:
+                                l2_key = l2_key + ut
+                            l2_hdu.header[l2_key] = (
                             RV2.headers["INSTRUMENT_HEADER"][
                                 header_map["ESO_keyword"].iloc[index].replace("%UT%", ut)
                             ],
@@ -186,7 +196,7 @@ def create_PRIMARY(RV2: RV2, names: list[str], nb_trace: int, nb_slice: int, lev
     # FILENAME KEYWORD
     if os.name == "nt":
         l2_hdu.header["FILENAME"] = (
-            "inst"
+            "ESPR_"
             + config.data_format
             + "_"
             + RV2.filename.split(".")[1].replace("-", "").replace("_", "")
@@ -195,7 +205,7 @@ def create_PRIMARY(RV2: RV2, names: list[str], nb_trace: int, nb_slice: int, lev
         )
     else:
         l2_hdu.header["FILENAME"] = (
-            "inst"
+            "ESPR_"
             + config.data_format
             + "_"
             + RV2.filename.split(".")[1].replace("-", "").replace(":", "")
@@ -246,6 +256,7 @@ def create_PRIMARY(RV2: RV2, names: list[str], nb_trace: int, nb_slice: int, lev
         "CCLR",
     ]
     # Setting datalvl keyword
+    l2_hdu.header['ISSOLAR'] = (bool(False), 'Is this an observation of the sun?')
     l2_hdu.header['DATALVL'] = (f'L{level}', header_map[header_map["Keyword"] == "DATALVL"]["Description"].iloc[0])
     with fits.open(names["raw_file"]) as hdu_raw:
         dpr_type = hdu_raw["PRIMARY"].header["HIERARCH ESO DPR TYPE"].split(",")
@@ -354,40 +365,40 @@ def create_PRIMARY(RV2: RV2, names: list[str], nb_trace: int, nb_slice: int, lev
     )
 
     # TLST KEYWORD
-    l2_hdu.header["TLST"] = (
+    l2_hdu.header["TLST1"] = (
         convert_lst(RV2.headers["INSTRUMENT_HEADER"]["LST"]),
-        header_map[header_map["Keyword"] == "TLST"]["Description"].iloc[0],
+        header_map[header_map["Keyword"] == "TLST1"]["Description"].iloc[0],
     )
 
     # TRA KEYWORD
-    l2_hdu.header["TRA"] = (
+    l2_hdu.header["TRA1"] = (
         deg_to_sexagesimal(RV2.headers["INSTRUMENT_HEADER"]["RA"], True),
-        header_map[header_map["Keyword"] == "TRA"]["Description"].iloc[0],
+        header_map[header_map["Keyword"] == "TRA1"]["Description"].iloc[0],
     )
 
     # TDEC KEYWORD
-    l2_hdu.header["TDEC"] = (
+    l2_hdu.header["TDEC1"] = (
         deg_to_sexagesimal(RV2.headers["INSTRUMENT_HEADER"]["DEC"], False),
-        header_map[header_map["Keyword"] == "TDEC"]["Description"].iloc[0],
+        header_map[header_map["Keyword"] == "TDEC1"]["Description"].iloc[0],
     )
 
     # TZA KEYWORD
     if(len(active_UTs) == 1):
-        l2_hdu.header["TZA"] = (
-            np.round(90 - l2_hdu.header["TEL"], 3),
-            header_map[header_map["Keyword"] == "TZA"]["Description"].iloc[0],
+        l2_hdu.header["TZA1"] = (
+            np.round(90 - l2_hdu.header["TEL1"], 3),
+            header_map[header_map["Keyword"] == "TZA1"]["Description"].iloc[0],
         )
     else:
         for ut in active_UTs:
             l2_hdu.header[f'TZA{ut}'] = (
                 np.round(90 - l2_hdu.header[f'TEL{ut}'], 3),
-                header_map[header_map["Keyword"] == "TZA"]["Description"].iloc[0]+' for UT'+ut,
+                header_map[header_map["Keyword"] == f"TZA1"]["Description"].iloc[0],
             )
 
     # THA KEYWORD
     l2_hdu.header["THA"] = (
-        compute_hour_angle(l2_hdu.header["TLST"], l2_hdu.header["TRA"]),
-        header_map[header_map["Keyword"] == "THA"]["Description"].iloc[0],
+        compute_hour_angle(l2_hdu.header["TLST1"], l2_hdu.header["TRA1"]),
+        header_map[header_map["Keyword"] == "THA1"]["Description"].iloc[0],
     )
 
     # MOONANG/MOONEL/MOONILLU/MOONRV/SUNEL KEYWORDS
@@ -404,13 +415,13 @@ def create_PRIMARY(RV2: RV2, names: list[str], nb_trace: int, nb_slice: int, lev
         moon_sun_params = get_moon_sun_info(
             RV2.headers["INSTRUMENT_HEADER"]["RA"],
             RV2.headers["INSTRUMENT_HEADER"]["DEC"],
-            l2_hdu.header[f"OBSLAT{active_UTs[0]}"],
-            l2_hdu.header[f"OBSLON{active_UTs[0]}"],
+            l2_hdu.header[f"OBSLAT"],
+            l2_hdu.header[f"OBSLON"],
             l2_hdu.header["OBSALT"],
             l2_hdu.header["JD_UTC"],
         )
 
-    # List of corresponding keywords§
+    # List of corresponding keywords
     moon_sun_keywords = ["SUNEL", "MOONANG", "MOONEL", "MOONILLU", "MOONRV"]
 
     # Assign values to headers dynamically
