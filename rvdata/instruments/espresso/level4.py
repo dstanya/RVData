@@ -12,15 +12,14 @@ Libraries
 
 from astropy.io import fits
 import os
-import pandas as pd
 from rvdata.core.models.level4 import RV4
-import rvdata.instruments.espresso.config.config as config
 from rvdata.instruments.espresso.utils import (
     get_files_names,
     create_PRIMARY,
     validate_fits_file,
     convert_CCF
 )
+
 
 # ESPRESSO Level4 Reader
 class ESPRESSORV4(RV4):
@@ -109,9 +108,8 @@ class ESPRESSORV4(RV4):
             self.set_header("INSTRUMENT_HEADER", hdul_ccf["PRIMARY"].header)
         # Create the PRIMARY header
         nb_trace = 2
-        create_PRIMARY(self, names, nb_trace, 1, level = 4)
+        create_PRIMARY(self, names, nb_trace, 1, level=4)
         convert_CCF(self, names)
         return
 
-        
     

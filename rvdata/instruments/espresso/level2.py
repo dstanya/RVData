@@ -143,7 +143,7 @@ class ESPRESSORV2(RV2):
         with fits.open(path) as hdu_raw:
             dpr_type = hdu_raw["PRIMARY"].header["HIERARCH ESO DPR TYPE"].split(",")[1]
             slice_nb = config.slice_nb[hdu_raw['PRIMARY'].header['HIERARCH ESO INS MODE']]
-            
+
         fibers = config.fiber.get(dpr_type, {})
         convert_RAW(self, path)
 

@@ -22,4 +22,5 @@ __all__ = [
     "convert_TELLURIC",
     "convert_SKYSUB",
     "convert_CCF",
+    "convert_S1D",
 ]

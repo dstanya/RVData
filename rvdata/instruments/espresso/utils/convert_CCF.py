@@ -4,11 +4,12 @@ import pandas as pd
 import numpy as np
 import os
 
+
 def convert_CCF(RV4: RV4, file_path: str) -> None:
     # Adding the primary header entries
     with fits.open(file_path['ccf_file']) as hdul:
         RV4.headers['PRIMARY']['BERV'] = (hdul['primary'].header['HIERARCH ESO QC BERV'],
-                                          '[km/s] Barycentric RV')
+        '[km/s] Barycentric RV')
         RV4.headers['PRIMARY']['RV'] = (hdul['primary'].header['HIERARCH ESO QC CCF RV'],
                                           '[km/s] Radial velocity value ')
         RV4.headers['PRIMARY']['RVERR'] = (hdul['primary'].header['HIERARCH ESO QC CCF RV ERROR'],

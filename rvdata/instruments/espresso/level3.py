@@ -12,15 +12,14 @@ Libraries
 
 from astropy.io import fits
 import os
-import pandas as pd
 from rvdata.core.models.level3 import RV3
-import rvdata.instruments.espresso.config.config as config
 from rvdata.instruments.espresso.utils import (
     get_files_names,
     create_PRIMARY,
     validate_fits_file,
     convert_S1D,
 )
+
 
 class ESPRESSORV3(RV3):
     """
@@ -114,8 +113,8 @@ class ESPRESSORV3(RV3):
         names = get_files_names(path, directory_structure, level=3)
         with fits.open(names['s1d_A']) as hdul_ccf:
             self.set_header("INSTRUMENT_HEADER", hdul_ccf["PRIMARY"].header)
-        
+
         nb_trace = 2
-        create_PRIMARY(self, names, nb_trace, 1, level = 3)
+        create_PRIMARY(self, names, nb_trace, 1, level=3)
         convert_S1D(self, names)
         return
