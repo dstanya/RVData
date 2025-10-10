@@ -20,7 +20,7 @@ import os
 import rvdata.instruments.espresso.config.config as config
 
 
-def get_files_names(full_path: str, directory_structure: str, level = 2) -> dict:
+def get_files_names(full_path: str, directory_structure: str, level=2) -> dict:
     """
     This function retrieves the names of related FITS files based on a given
     file's path and constructs a dictionary containing paths to these files.
@@ -42,7 +42,7 @@ def get_files_names(full_path: str, directory_structure: str, level = 2) -> dict
         repo_path = repo_path.replace(
             "ESPRESSORAW/raw", f"ESPRESSODRS/{config.DRS_VERSION}/reduced"
         )
-    if(level == 2):
+    if (level == 2):
 
         # Construct paths for the S2D and BLAZE FITS files (both A and B versions)
         s2d_blaze_file_A = os.path.join(
@@ -128,7 +128,7 @@ def get_files_names(full_path: str, directory_structure: str, level = 2) -> dict
             "skysub_file_A": skysub_file_A,
         }
         return names
-    elif(level == 3):
+    elif (level == 3):
         names = {
             "raw_file": full_path,
             "s1d_A": os.path.join(repo_path, "r." + base_file_name[:-5] + "_S1D_A.fits"),
@@ -137,7 +137,7 @@ def get_files_names(full_path: str, directory_structure: str, level = 2) -> dict
             "s1d_tell_corr_A": os.path.join(repo_path, "r." + base_file_name[:-5] + "_S1D_TELL_CORR_A.fits"),
         }
         return names
-    elif(level == 4):
+    elif (level == 4):
         names = {
             "raw_file": full_path,
             "ccf_file": os.path.join(repo_path, "r." + base_file_name[:-5] + "_CCF_A.fits"),
@@ -146,7 +146,6 @@ def get_files_names(full_path: str, directory_structure: str, level = 2) -> dict
             "ccf_sky_file": os.path.join(repo_path, "r." + base_file_name[:-5] + "_CCF_SKYSUB_A.fits"),
         }
         return names
-
 
 
 def adjust_repo_path(

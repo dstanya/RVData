@@ -10,17 +10,17 @@ from rvdata.tests.regression.compliance import check_l4_extensions, check_l4_hea
 
 file_urls = {
     "ESPRESSO": {
-        'raw' : 'https://dace.unige.ch/downloads/EPRV_standard_data/ESPRE.2017-12-03T02:09:40.348.fits',
-        'S2D_BLAZE_A' : 'https://dace.unige.ch/downloads/EPRV_standard_data/r.ESPRE.2017-12-03T02:09:40.348_S2D_BLAZE_A.fits',
-        'S2D_BLAZE_B' : 'https://dace.unige.ch/downloads/EPRV_standard_data/r.ESPRE.2017-12-03T02:09:40.348_S2D_BLAZE_B.fits',
-        'BLAZE_A' : 'https://dace.unige.ch/downloads/EPRV_standard_data/r.ESPRE.2017-12-03T10:43:59.835_BLAZE_A.fits',
-        'BLAZE_B' : 'https://dace.unige.ch/downloads/EPRV_standard_data/r.ESPRE.2017-12-03T10:43:59.835_BLAZE_B.fits',
-        'S1D_A' : 'https://dace.unige.ch/downloads/EPRV_standard_data/r.ESPRE.2017-12-03T02:09:40.348_S1D_A.fits',
-        'S1D_B' : 'https://dace.unige.ch/downloads/EPRV_standard_data/r.ESPRE.2017-12-03T02:09:40.348_S1D_B.fits',
-        'S1D_TELL_CORR_A' : 'https://dace.unige.ch/downloads/EPRV_standard_data/r.ESPRE.2017-12-03T02:09:40.348_S1D_TELL_CORR_A.fits',
-        'DRIFT_MATRIX_B' : 'https://dace.unige.ch/downloads/EPRV_standard_data/r.ESPRE.2017-12-03T02:09:40.348_DRIFT_MATRIX_B.fits',
-        'CCF_A': 'https://dace.unige.ch/downloads/EPRV_standard_data/r.ESPRE.2017-12-03T02:09:40.348_CCF_A.fits',''
-        'CCF_TELL_CORR_A' : 'https://dace.unige.ch/downloads/EPRV_standard_data/r.ESPRE.2017-12-03T02:09:40.348_CCF_TELL_CORR_A.fits'
+        'raw': 'https://dace.unige.ch/downloads/EPRV_standard_data/ESPRE.2017-12-03T02:09:40.348.fits',
+        'S2D_BLAZE_A': 'https://dace.unige.ch/downloads/EPRV_standard_data/r.ESPRE.2017-12-03T02:09:40.348_S2D_BLAZE_A.fits',
+        'S2D_BLAZE_B': 'https://dace.unige.ch/downloads/EPRV_standard_data/r.ESPRE.2017-12-03T02:09:40.348_S2D_BLAZE_B.fits',
+        'BLAZE_A': 'https://dace.unige.ch/downloads/EPRV_standard_data/r.ESPRE.2017-12-03T10:43:59.835_BLAZE_A.fits',
+        'BLAZE_B': 'https://dace.unige.ch/downloads/EPRV_standard_data/r.ESPRE.2017-12-03T10:43:59.835_BLAZE_B.fits',
+        'S1D_A': 'https://dace.unige.ch/downloads/EPRV_standard_data/r.ESPRE.2017-12-03T02:09:40.348_S1D_A.fits',
+        'S1D_B': 'https://dace.unige.ch/downloads/EPRV_standard_data/r.ESPRE.2017-12-03T02:09:40.348_S1D_B.fits',
+        'S1D_TELL_CORR_A': 'https://dace.unige.ch/downloads/EPRV_standard_data/r.ESPRE.2017-12-03T02:09:40.348_S1D_TELL_CORR_A.fits',
+        'DRIFT_MATRIX_B': 'https://dace.unige.ch/downloads/EPRV_standard_data/r.ESPRE.2017-12-03T02:09:40.348_DRIFT_MATRIX_B.fits',
+        'CCF_A': 'https://dace.unige.ch/downloads/EPRV_standard_data/r.ESPRE.2017-12-03T02:09:40.348_CCF_A.fits',
+        'CCF_TELL_CORR_A': 'https://dace.unige.ch/downloads/EPRV_standard_data/r.ESPRE.2017-12-03T02:09:40.348_CCF_TELL_CORR_A.fits'
     }
 }
 

@@ -410,7 +410,7 @@ def create_PRIMARY(RV2: RV2, names: list[str], nb_trace: int, nb_slice: int, lev
             l2_hdu.header[f'TZA{ut}'] = (
                 np.round(90 - l2_hdu.header[f'TEL{ut}'], 3),
                 header_map[header_map["Keyword"] ==
-                           f"TZA1"]["Description"].iloc[0],
+                           "TZA1"]["Description"].iloc[0],
             )
 
     # THA KEYWORD
@@ -433,8 +433,8 @@ def create_PRIMARY(RV2: RV2, names: list[str], nb_trace: int, nb_slice: int, lev
         moon_sun_params = get_moon_sun_info(
             RV2.headers["INSTRUMENT_HEADER"]["RA"],
             RV2.headers["INSTRUMENT_HEADER"]["DEC"],
-            l2_hdu.header[f"OBSLAT"],
-            l2_hdu.header[f"OBSLON"],
+            l2_hdu.header["OBSLAT"],
+            l2_hdu.header["OBSLON"],
             l2_hdu.header["OBSALT"],
             l2_hdu.header["JD_UTC"],
         )
@@ -853,7 +853,5 @@ def get_moon_sun_info(
         ProjVelEarthMoon_kmps = dvEarthMoon_kmps.dot(uEarthMoon.get_xyz())
 
         vel_moon_kmps = ProjVelEarthMoon_kmps + ProjVelMoonSun_kmps
-        berv1_Target_astropy = coords.radial_velocity_correction(
-            obstime=t_obs, location=loc).to('km/s')
 
         return [sun_el, moonStarSep_deg, moon_el, IlluminatedMoonFraction.value, vel_moon_kmps.value]

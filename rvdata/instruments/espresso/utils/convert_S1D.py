@@ -17,18 +17,14 @@ Libraries
 """
 
 from astropy.io import fits
-from astropy.constants import c
-import numpy as np
-
-
 from rvdata.core.models.level3 import RV3
 import rvdata.instruments.espresso.config.config as config
 from rvdata.core.models.definitions import LEVEL3_EXTENSIONS
-import pandas as pd
 import os
 
+
 def convert_S1D(
-    RV3: RV3, file_names: dict, 
+    RV3: RV3, file_names: dict,
 ) -> None:
     """
     Extracts and processes relevant data from an ESPRESSO S1D FITS file.
@@ -47,7 +43,7 @@ def convert_S1D(
         None
     """
     RV3.headers['PRIMARY']["BLZCORR"] = (True, 'Has blaze been removed?')
-    RV3.headers['PRIMARY']["LMPCORR"] = (True,'Has lamp SED been removed?')
+    RV3.headers['PRIMARY']["LMPCORR"] = (True, 'Has lamp SED been removed?')
     RV3.headers['PRIMARY']["SEDCORR"] = (False, 'Has SED been removed?')
     for file in ['s1d_A', 's1d_B', 's1d_skysub_A', 's1d_tell_corr_A']:
         if not file_names[file] or not os.path.exists(file_names[file]):
