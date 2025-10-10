@@ -111,5 +111,3 @@ class ESPRESSORV4(RV4):
         create_PRIMARY(self, names, nb_trace, 1, level=4)
         convert_CCF(self, names)
         return
-
-    

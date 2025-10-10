@@ -67,7 +67,6 @@ def convert_RAW(RV2: RV2, file_path: str) -> None:
                 "No EXP meter data found, "
                 "EXPEMETER extension will not be generated"
             )
-
         # Loop through all predefined extensions in config.extnames_raw
         active_UTs = [str(c) for c in [1, 2, 3, 4]
                       if hdul['PRIMARY'].header[f'HIERARCH ESO OCS TEL{c} ST']]

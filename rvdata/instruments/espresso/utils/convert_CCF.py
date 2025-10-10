@@ -10,12 +10,10 @@ def convert_CCF(RV4: RV4, file_path: str) -> None:
     with fits.open(file_path['ccf_file']) as hdul:
         RV4.headers['PRIMARY']['BERV'] = (
             hdul['primary'].header['HIERARCH ESO QC BERV'],
-            '[km/s] Barycentric RV'
-        )
+            '[km/s] Barycentric RV')
         RV4.headers['PRIMARY']['RV'] = (
             hdul['primary'].header['HIERARCH ESO QC CCF RV'],
-            '[km/s] Radial velocity value '
-        )
+            '[km/s] Radial velocity value ')
         RV4.headers['PRIMARY']['RVERR'] = (
             hdul['primary'].header['HIERARCH ESO QC CCF RV ERROR'],
             '[km/s] Error on the radial velocity value ')
