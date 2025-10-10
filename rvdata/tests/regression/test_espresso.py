@@ -26,7 +26,7 @@ file_urls = {
 
 
 def download_file(url, filename):
-    response = requests.get(url)
+    response = requests.get(url, verify=False)
     response.raise_for_status()  # Check if the request was successful
     with open(filename, "wb") as file:
         file.write(response.content)
