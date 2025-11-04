@@ -134,11 +134,14 @@ class RVDataModel(object):
                         # Table contains the RECEIPT
                         df: pd.DataFrame = t.to_pandas()
                         # TODO: get receipt columns from core.models.config.BASE-RECEIPT-columns.csv
-                        df = df.reindex(
-                            df.columns.union(RECEIPT_COL, sort=False),
-                            axis=1,
-                            fill_value="",
-                        )
+                        if df.empty:
+                            df = pd.DataFrame(columns=RECEIPT_COL)
+                        else:
+                            df = df.reindex(
+                                df.columns.union(RECEIPT_COL, sort=False),
+                                axis=1,
+                                fill_value="",
+                            )
                         setattr(self, hdu.name, df)
                         setattr(self, hdu.name.lower(), getattr(self, hdu.name))
                         self.headers[hdu.name] = hdu.header
