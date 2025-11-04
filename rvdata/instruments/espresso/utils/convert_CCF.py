@@ -21,6 +21,9 @@ def convert_CCF(RV4: RV4, file_path: str) -> None:
             'CCF', 'RV derivation method')
         RV4.headers['PRIMARY']['SYSVEL'] = (
             0, 'Systemic velocity subtracted from RV')
+        RV4.headers['PRIMARY']['BJDTDB'] = (
+            hdul['primary'].header['HIERARCH ESO QC BJD'],
+            '[JD] Barycentric Julian Day in Terrestrial Dynamical time')
     # Creating the RV extension
     convert_RV(RV4, file_path['ccf_file'], trace_nb=1)
     # Creating the CCF extension

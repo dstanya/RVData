@@ -41,7 +41,12 @@ class RV4(rvdata.core.models.base.RVDataModel):
     def _read(self, hdul: fits.HDUList) -> None:
         l4_ext = LEVEL4_EXTENSIONS.set_index("Name")
         for hdu in hdul:
-            fits_type = l4_ext.loc[hdu.name]["DataType"]
+            if ('RV' in hdu.name):
+                fits_type = "BinTableHDU"
+            elif ('CCF' in hdu.name):
+                fits_type = "ImageHDU"
+            else:
+                fits_type = l4_ext.loc[hdu.name]["DataType"]
             if hdu.name not in self.extensions.keys():
                 self.create_extension(hdu.name, fits_type)
 
