@@ -40,14 +40,14 @@ extnames_raw = {
 extnames_telluric = {
     "SCIDATA": "_TELL_COR_FLUX",
     "ERRDATA": "_TELL_COR_VAR",
-    "QUALDATA": "_TELL_COR_QUALDATA",
+    "QUALDATA": "_TELL_COR_QUALITY",
 }
 
 # Allows the conversion of SKYSUB files
 extnames_skysub = {
     "SCIDATA": "_SKYSUB_FLUX",
     "ERRDATA": "_SKYSUB_VAR",
-    "QUALDATA": "_SKYSUB_QUALDATA",
+    "QUALDATA": "_SKYSUB_QUALITY",
 }
 
 # Allows the conversion of S2D_BLAZE files
@@ -55,8 +55,8 @@ extnames = {
     "SCIDATA": "_FLUX",
     "ERRDATA": "_VAR",
     "WAVEDATA_VAC_BARY": "_WAVE",
-    "QUALDATA": "_QUALDATA",
-    "DLLDATA_VAC_BARY": "_DISP",
+    "QUALDATA": "_QUALITY",
+#    "DLLDATA_VAC_BARY": "_DISP",
 }
 extnames_s1d = {
     'wavelength': ['STITCHED_CORR_TRACE1_WAVE', 'COMBINED_STITCHED_CORR_WAVE'],
