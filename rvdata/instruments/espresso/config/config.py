@@ -56,8 +56,8 @@ extnames = {
     "ERRDATA": "_VAR",
     "WAVEDATA_VAC_BARY": "_WAVE",
     "QUALDATA": "_QUALITY",
-#    "DLLDATA_VAC_BARY": "_DISP",
 }
+#    "DLLDATA_VAC_BARY": "_DISP",
 extnames_s1d = {
     'wavelength': ['STITCHED_CORR_TRACE1_WAVE', 'COMBINED_STITCHED_CORR_WAVE'],
     'flux': ['STITCHED_CORR_TRACE1_FLUX', 'COMBINED_STITCHED_CORR_FLUX'],
