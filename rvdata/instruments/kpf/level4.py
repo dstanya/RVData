@@ -74,7 +74,7 @@ class KPFRV4(RV4):
             skey = row["STANDARD"]
             kpfkey = row["INSTRUMENT"]
             if pd.notnull(kpfkey):
-                kpfval = ihead[kpfkey]
+                kpfval = ihead.get(kpfkey, row["DEFAULT"])
             else:
                 kpfval = row["DEFAULT"]
             if pd.notnull(kpfval):
