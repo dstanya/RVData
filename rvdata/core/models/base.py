@@ -206,7 +206,7 @@ class RVDataModel(object):
                     elif row["Data type"].lower() == "boolean":
                         self.headers['PRIMARY'][key] = bool(value)
                     else:
-                        warnings.warn(f"Unknown type {row['Type']} for keyword {key}")
+                        warnings.warn(f"Unknown type {row['Data type']} for keyword {key}")
                 except (TypeError, AttributeError, ValueError):
                     warnings.warn(
                         f"Cannot convert value {value} for keyword {key} to type {row['Data type']}"
