@@ -44,6 +44,10 @@ class RV2(rvdata.core.models.base.RVDataModel):
             if "TRACE" in hdu.name:
                 t1 = "TRACE1_" + hdu.name.split("_")[1]
                 fits_type = l2_ext.loc[t1]["DataType"]
+            elif "IMAGE" in hdu.name:
+                fits_type = l2_ext.loc['IMAGE']['DataType']
+            elif 'DRIFT' in hdu.name:
+                fits_type = l2_ext.loc['DRIFT']['DataType']
             else:
                 fits_type = l2_ext.loc[hdu.name]["DataType"]
             if hdu.name not in self.extensions.keys():
