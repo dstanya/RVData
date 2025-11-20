@@ -13,7 +13,7 @@ import rvdata.core.models.level2
 from rvdata.core.models.definitions import LEVEL4_EXTENSIONS
 
 
-class RV4(rvdata.core.models.level2.RV2):
+class RV4(rvdata.core.models.base.RVDataModel):
     """
     The level 4 RV data. Initialized with empty fields.
     Attributes inherited from RVDataModel, additional attributes below.
@@ -41,7 +41,12 @@ class RV4(rvdata.core.models.level2.RV2):
     def _read(self, hdul: fits.HDUList) -> None:
         l4_ext = LEVEL4_EXTENSIONS.set_index("Name")
         for hdu in hdul:
-            fits_type = l4_ext.loc[hdu.name]["DataType"]
+            if ('RV' in hdu.name):
+                fits_type = "BinTableHDU"
+            elif ('CCF' in hdu.name):
+                fits_type = "ImageHDU"
+            else:
+                fits_type = l4_ext.loc[hdu.name]["DataType"]
             if hdu.name not in self.extensions.keys():
                 self.create_extension(hdu.name, fits_type)
 

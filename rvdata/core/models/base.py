@@ -21,6 +21,7 @@ from rvdata.core.models.definitions import (
     FITS_TYPE_MAP,
     INSTRUMENT_READERS,
     LEVEL2_PRIMARY_KEYWORDS,
+    LEVEL3_PRIMARY_KEYWORDS,
     LEVEL4_PRIMARY_KEYWORDS,
 )
 from rvdata.core.models.receipt_columns import RECEIPT_COL
@@ -133,11 +134,14 @@ class RVDataModel(object):
                         # Table contains the RECEIPT
                         df: pd.DataFrame = t.to_pandas()
                         # TODO: get receipt columns from core.models.config.BASE-RECEIPT-columns.csv
-                        df = df.reindex(
-                            df.columns.union(RECEIPT_COL, sort=False),
-                            axis=1,
-                            fill_value="",
-                        )
+                        if df.empty:
+                            df = pd.DataFrame(columns=RECEIPT_COL)
+                        else:
+                            df = df.reindex(
+                                df.columns.union(RECEIPT_COL, sort=False),
+                                axis=1,
+                                fill_value="",
+                            )
                         setattr(self, hdu.name, df)
                         setattr(self, hdu.name.lower(), getattr(self, hdu.name))
                         self.headers[hdu.name] = hdu.header
@@ -151,6 +155,11 @@ class RVDataModel(object):
                     import rvdata.core.models.level2
 
                     method = rvdata.core.models.level2.RV2._read
+                    method(self, hdu_list)
+                elif lvl == 3:
+                    import rvdata.core.models.level3
+
+                    method = rvdata.core.models.level4.RV3._read
                     method(self, hdu_list)
                 elif lvl == 4:
                     import rvdata.core.models.level4
@@ -178,7 +187,7 @@ class RVDataModel(object):
 
         # check and recast the headers into appropriate types
         for i, row in pd.concat(
-            [LEVEL2_PRIMARY_KEYWORDS, LEVEL4_PRIMARY_KEYWORDS]
+            [LEVEL2_PRIMARY_KEYWORDS, LEVEL3_PRIMARY_KEYWORDS, LEVEL4_PRIMARY_KEYWORDS]
         ).iterrows():
             key = row["Keyword"]
             if key in self.headers["PRIMARY"]:
@@ -194,8 +203,10 @@ class RVDataModel(object):
                         self.headers["PRIMARY"][key] = str(value)
                     elif row["Data type"].lower() == "double":
                         self.headers["PRIMARY"][key] = np.float64(value)
+                    elif row["Data type"].lower() == "boolean":
+                        self.headers['PRIMARY'][key] = bool(value)
                     else:
-                        warnings.warn(f"Unknown type {row['Type']} for keyword {key}")
+                        warnings.warn(f"Unknown type {row['Data type']} for keyword {key}")
                 except (TypeError, AttributeError, ValueError):
                     warnings.warn(
                         f"Cannot convert value {value} for keyword {key} to type {row['Data type']}"
