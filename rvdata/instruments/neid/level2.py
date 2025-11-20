@@ -9,6 +9,9 @@ import pandas as pd
 # import base class
 from rvdata.core.models.level2 import RV2
 
+# NEID specific utility functions
+from rvdata.instruments.neid.utils import make_neid_primary_header
+
 
 # NEID Level2 Reader
 class NEIDRV2(RV2):
@@ -79,21 +82,6 @@ class NEIDRV2(RV2):
         ext_table["extension_name"].append("INSTRUMENT_HEADER")
         ext_table["description"].append("Primary header of native instrument file")
 
-        # Set up for obs-mode dependent primary header entries
-        mode_dep_phead = {}
-        catalogue_map = {
-            "CID": "QOBJECT",
-            "CRA": "QRA",
-            "CDEC": "QDEC",
-            "CEQNX": "QEQNX",
-            "CEPCH": "QEPOCH",
-            "CPLX": "QPLX",
-            "CPMR": "QPMRA",
-            "CPMD": "QPMDEC",
-            "CRV": "QRV",
-            "CZ": "QZ",
-        }
-
         # Order Table
         order_table_data = pd.DataFrame(
             {
@@ -113,22 +101,11 @@ class NEIDRV2(RV2):
         if hdul[0].header["OBS-MODE"] == "HR":
             fiber_list = ["SCI", "SKY", "CAL"]
             expmeter_index = 4
-            mode_dep_phead["CLSRC3"] = hdul[0].header["CAL-OBJ"]
         elif hdul[0].header["OBS-MODE"] == "HE":
             fiber_list = ["SCI", "SKY"]
             expmeter_index = 3
-        mode_dep_phead["NUMTRACE"] = len(fiber_list)
 
         for i_fiber, fiber in enumerate(fiber_list):
-            mode_dep_phead[f"TRACE{i_fiber+1}"] = hdul[0].header[f"{fiber}-OBJ"]
-
-            if hdul[0].header["OBSTYPE"] == "Cal":
-                mode_dep_phead[f"CLSRC{i_fiber+1}"] = hdul[0].header[f"{fiber}-OBJ"]
-
-            if hdul[0].header[f"{fiber}-OBJ"] == hdul[0].header["QOBJECT"]:
-                for pkey, ikey in catalogue_map.items():
-                    mode_dep_phead[f"{pkey}{i_fiber+1}"] = hdul[0].header[ikey]
-                mode_dep_phead[f"CSRC{i_fiber+1}"] = "GAIADR2"
 
             # Set the input extension names for this fiber
             flux_ext = f"{fiber}FLUX"
@@ -290,39 +267,8 @@ class NEIDRV2(RV2):
         # Images - Nothing for now
 
         # Standardized primary header
-
-        hmap_path = os.path.join(os.path.dirname(__file__), "config/header_map.csv")
-        headmap = pd.read_csv(hmap_path, header=0)
-
-        phead = fits.PrimaryHDU().header
-        ihead = self.headers["INSTRUMENT_HEADER"]
-        for i, row in headmap.iterrows():
-            skey = row["STANDARD"]
-            instkey = row["INSTRUMENT"]
-            if row["MODE_DEP"] != "Y":
-                if pd.notnull(instkey):
-                    instval = ihead[instkey]
-                else:
-                    instval = row["DEFAULT"]
-                if pd.notnull(instval):
-                    phead[skey] = instval
-                else:
-                    phead[skey] = None
-            else:
-                if skey in mode_dep_phead.keys():
-                    phead[skey] = mode_dep_phead[skey]
-                else:
-                    continue
-
-        # Add instrument era
-        eramap = pd.read_csv(
-            os.path.join(os.path.dirname(__file__), "config/neid_inst_eras.csv")
-        )
-        era_time_diffs = phead["JD_UTC"] - eramap["startdate"].values
-        era = eramap["era"].values[
-            np.argmin(era_time_diffs[np.where(era_time_diffs >= 0)[0]])
-        ]
-        phead["INSTERA"] = era
+        phead = make_neid_primary_header.make_base_primary_header(hdul[0].header)
+        phead["DATALVL"] = 2
 
         self.set_header("PRIMARY", phead)
 
