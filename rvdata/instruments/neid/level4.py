@@ -146,9 +146,61 @@ class NEIDRV4(RV4):
 
         # Diagnostics extension - for now just put in the activity extension directly
 
+        diagnostics_table_data = {"metric_name": [], "value": [], "uncertainty": []}
+
+        # Activity indicators in NEID extension to include in diagnostics table
+        neid_activity_use = {
+            "CaIIHK": "CaIIHK",
+            "HeI_1": "HeI",
+            "NaI": "NaI",
+            "Ha06_1": "Halpha06",
+            "Ha16_1": "Halpha16",
+            "CaI_1": "CaI",
+            "CaIRT1": "CaIRT1",
+            "CaIRT2": "CaIRT2",
+            "CaIRT3": "CaIRT3",
+            "NaINIR": "NaINIR",
+            "PaDelta": "PaDelta",
+            "Mn539": "Mn539",
+        }
+
+        for index_name_neid, index_name_std in neid_activity_use.items():
+            # Location in the NEID table with that index
+            table_loc = np.where(hdul["ACTIVITY"].data["INDEX"] == index_name_neid)[0]
+
+            diagnostics_table_data["metric_name"].append(index_name_std)
+            diagnostics_table_data["value"].append(
+                hdul["ACTIVITY"].data["VALUE"][table_loc]
+            )
+            diagnostics_table_data["uncertainty"].append(
+                hdul["UNCERTAINTY"].data["VALUE"][table_loc]
+            )
+
+            # Also output the telluric corrected version
+            table_loc = np.where(
+                hdul["ACTIVITY"].data["INDEX"] == (index_name_neid + "_tellcorr")
+            )[0]
+
+            diagnostics_table_data["metric_name"].append(index_name_std + "_tellcorr")
+            diagnostics_table_data["value"].append(
+                hdul["ACTIVITY"].data["VALUE"][table_loc]
+            )
+            diagnostics_table_data["uncertainty"].append(
+                hdul["UNCERTAINTY"].data["VALUE"][table_loc]
+            )
+
+        # Add CCF activity indicators as well
+        diagnostics_table_data["metric_name"].append("CCF_FWHM")
+        diagnostics_table_data["value"].append(hdul["CCFS"].header["FWHMMOD"])
+        diagnostics_table_data["uncertainty"].append(np.nan)
+
+        diagnostics_table_data["metric_name"].append("CCF_BIS")
+        diagnostics_table_data["value"].append(hdul["CCFS"].header["BISMOD"])
+        diagnostics_table_data["uncertainty"].append(hdul["CCFS"].header["EBISMOD"])
+
+        # Output the diagnostics table
         self.create_extension(
             "DIAGNOSTICS1",
             "BinTableHDU",
-            data=hdul["ACTIVITY"].data,
-            header=hdul["ACTIVITY"].header,
+            data=pd.DataFrame(diagnostics_table_data),
         )
