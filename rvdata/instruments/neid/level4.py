@@ -60,6 +60,12 @@ class NEIDRV4(RV4):
         phead = make_neid_primary_header.make_base_primary_header(hdul[0].header)
         phead["DATALVL"] = 4
 
+        # Add RV specific entries to the primary header
+        phead["BJD_TDB"] = hdul["CCFS"].header["CCFJDMOD"]
+        phead["RV"] = hdul["CCFS"].header["CCFRVMOD"]
+        phead["RVERROR"] = hdul["CCFS"].header["DVRMSMOD"]
+        phead["RVMETHOD"] = "CCF"
+
         self.set_header("PRIMARY", phead)
 
         # RV1 - turn the CCFS extension header into a table
@@ -98,6 +104,7 @@ class NEIDRV4(RV4):
             }
         )
 
+        # Add information about the wavelength/pixel extents of the RV computation per order
         for order in range(122):
             if (
                 np.isfinite(neid_fsr["fsr_start"].values[order])
