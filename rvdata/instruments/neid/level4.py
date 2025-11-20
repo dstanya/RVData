@@ -170,10 +170,10 @@ class NEIDRV4(RV4):
 
             diagnostics_table_data["metric_name"].append(index_name_std)
             diagnostics_table_data["value"].append(
-                hdul["ACTIVITY"].data["VALUE"][table_loc]
+                hdul["ACTIVITY"].data["VALUE"][table_loc][0]
             )
             diagnostics_table_data["uncertainty"].append(
-                hdul["UNCERTAINTY"].data["VALUE"][table_loc]
+                hdul["ACTIVITY"].data["UNCERTAINTY"][table_loc][0]
             )
 
             # Also output the telluric corrected version
@@ -183,10 +183,10 @@ class NEIDRV4(RV4):
 
             diagnostics_table_data["metric_name"].append(index_name_std + "_tellcorr")
             diagnostics_table_data["value"].append(
-                hdul["ACTIVITY"].data["VALUE"][table_loc]
+                hdul["ACTIVITY"].data["VALUE"][table_loc][0]
             )
             diagnostics_table_data["uncertainty"].append(
-                hdul["UNCERTAINTY"].data["VALUE"][table_loc]
+                hdul["ACTIVITY"].data["UNCERTAINTY"][table_loc][0]
             )
 
         # Add CCF activity indicators as well
