@@ -6,10 +6,10 @@ import pandas as pd
 import os
 from collections import OrderedDict
 
-# # import base class
 from rvdata.core.models.level4 import RV4
 
-# from rvdata.core.models.definitions import LEVEL4_EXTENSIONS
+# NEID specific utility functions
+from rvdata.instruments.neid.utils import make_neid_primary_header
 
 
 # KPF Level2 Reader
@@ -56,75 +56,9 @@ class NEIDRV4(RV4):
         # Instrument header
         self.set_header("INSTRUMENT_HEADER", hdul["PRIMARY"].header)
 
-        # Set up the primary header - code from L2 translator to handle OBSMODE dependent entries
-
-        # Set up for obs-mode dependent primary header entries
-        mode_dep_phead = {}
-        catalogue_map = {
-            "CID": "QOBJECT",
-            "CRA": "QRA",
-            "CDEC": "QDEC",
-            "CEQNX": "QEQNX",
-            "CEPCH": "QEPOCH",
-            "CPLX": "QPLX",
-            "CPMR": "QPMRA",
-            "CPMD": "QPMDEC",
-            "CRV": "QRV",
-            "CZ": "QZ",
-        }
-
-        # Check observation mode to set number of traces
-        if hdul[0].header["OBS-MODE"] == "HR":
-            fiber_list = ["SCI", "SKY", "CAL"]
-            mode_dep_phead["CLSRC3"] = hdul[0].header["CAL-OBJ"]
-        elif hdul[0].header["OBS-MODE"] == "HE":
-            fiber_list = ["SCI", "SKY"]
-        mode_dep_phead["NUMTRACE"] = len(fiber_list)
-
-        for i_fiber, fiber in enumerate(fiber_list):
-            mode_dep_phead[f"TRACE{i_fiber+1}"] = hdul[0].header[f"{fiber}-OBJ"]
-
-            if hdul[0].header["OBSTYPE"] == "Cal":
-                mode_dep_phead[f"CLSRC{i_fiber+1}"] = hdul[0].header[f"{fiber}-OBJ"]
-
-            if hdul[0].header[f"{fiber}-OBJ"] == hdul[0].header["QOBJECT"]:
-                for pkey, ikey in catalogue_map.items():
-                    mode_dep_phead[f"{pkey}{i_fiber+1}"] = hdul[0].header[ikey]
-                mode_dep_phead[f"CSRC{i_fiber+1}"] = "GAIADR2"
-
-        # Set up data standard primary header
-        hmap_path = os.path.join(os.path.dirname(__file__), "config/header_map.csv")
-        headmap = pd.read_csv(hmap_path, header=0)
-
-        phead = fits.PrimaryHDU().header
-        ihead = self.headers["INSTRUMENT_HEADER"]
-        for i, row in headmap.iterrows():
-            skey = row["STANDARD"]
-            instkey = row["INSTRUMENT"]
-            if row["MODE_DEP"] != "Y":
-                if pd.notnull(instkey):
-                    instval = ihead[instkey]
-                else:
-                    instval = row["DEFAULT"]
-                if pd.notnull(instval):
-                    phead[skey] = instval
-                else:
-                    phead[skey] = None
-            else:
-                if skey in mode_dep_phead.keys():
-                    phead[skey] = mode_dep_phead[skey]
-                else:
-                    continue
-
-        # Add instrument era
-        eramap = pd.read_csv(
-            os.path.join(os.path.dirname(__file__), "config/neid_inst_eras.csv")
-        )
-        era_time_diffs = phead["JD_UTC"] - eramap["startdate"].values
-        era = eramap["era"].values[
-            np.argmin(era_time_diffs[np.where(era_time_diffs >= 0)[0]])
-        ]
-        phead["INSTERA"] = era
+        # Set up the primary header
+        phead = make_neid_primary_header.make_base_primary_header(hdul[0].header)
+        phead["DATALVL"] = 4
 
         self.set_header("PRIMARY", phead)
 
