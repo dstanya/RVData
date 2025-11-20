@@ -59,11 +59,6 @@ class NEIDRV4(RV4):
             "description": [],
         }
 
-        # Instrument header
-        self.set_header("INSTRUMENT_HEADER", hdul["PRIMARY"].header)
-        ext_table["extension_name"].append("INSTRUMENT_HEADER")
-        ext_table["description"].append("Primary header of native instrument file")
-
         # Set up the primary header
         phead = make_neid_primary_header.make_base_primary_header(hdul[0].header)
         phead["DATALVL"] = 4
@@ -75,6 +70,16 @@ class NEIDRV4(RV4):
         phead["RVMETHOD"] = "CCF"
 
         self.set_header("PRIMARY", phead)
+
+        ext_table["extension_name"].append("PRIMARY")
+        ext_table["description"].append(
+            "EPRV Standard FITS HEADER (no data)"
+        )
+
+        # Instrument header
+        self.set_header("INSTRUMENT_HEADER", hdul["PRIMARY"].header)
+        ext_table["extension_name"].append("INSTRUMENT_HEADER")
+        ext_table["description"].append("Primary header of native instrument file")
 
         # RV1 - turn the CCFS extension header into a table
 
