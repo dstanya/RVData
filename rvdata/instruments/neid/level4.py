@@ -53,8 +53,16 @@ class NEIDRV4(RV4):
 
     def _read(self, hdul: fits.HDUList, **kwargs) -> None:
 
+        # Set up extension description table
+        ext_table = {
+            "extension_name": [],
+            "description": [],
+        }
+
         # Instrument header
         self.set_header("INSTRUMENT_HEADER", hdul["PRIMARY"].header)
+        ext_table["extension_name"].append("INSTRUMENT_HEADER")
+        ext_table["description"].append("Primary header of native instrument file")
 
         # Set up the primary header
         phead = make_neid_primary_header.make_base_primary_header(hdul[0].header)
@@ -125,6 +133,10 @@ class NEIDRV4(RV4):
                 rv_table_data["pixel_end"][order] = fsr_pixel_end
 
         self.set_data("RV1", pd.DataFrame(rv_table_data))
+        ext_table["extension_name"].append("RV1")
+        ext_table["description"].append(
+            "Order-wise RV measurement table for NEID Science fiber trace"
+        )
 
         # CCF extension
 
@@ -143,6 +155,8 @@ class NEIDRV4(RV4):
         self.create_extension(
             "CCF1", "ImageHDU", data=hdul["CCFS"].data, header=ccf_header
         )
+        ext_table["extension_name"].append("CCF1")
+        ext_table["description"].append("Order-wise CCFs for NEID Science fiber trace")
 
         # Diagnostics extension - for now just put in the activity extension directly
 
@@ -204,3 +218,10 @@ class NEIDRV4(RV4):
             "BinTableHDU",
             data=pd.DataFrame(diagnostics_table_data),
         )
+        ext_table["extension_name"].append("DIAGNOSTICS1")
+        ext_table["description"].append(
+            "Table of activity diagnostics for NEID science fiber trace"
+        )
+
+        # Set extension description table
+        self.set_data("EXT_DESCRIPT", pd.DataFrame(ext_table))
