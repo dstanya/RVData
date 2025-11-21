@@ -72,9 +72,7 @@ class NEIDRV4(RV4):
         self.set_header("PRIMARY", phead)
 
         ext_table["extension_name"].append("PRIMARY")
-        ext_table["description"].append(
-            "EPRV Standard FITS HEADER (no data)"
-        )
+        ext_table["description"].append("EPRV Standard FITS HEADER (no data)")
 
         # Instrument header
         self.set_header("INSTRUMENT_HEADER", hdul["PRIMARY"].header)
@@ -94,9 +92,11 @@ class NEIDRV4(RV4):
                 ),
                 "RV": np.array(
                     [
-                        hdul["CCFS"].header[f"CCFRV{173-order:03d}"]
-                        if hdul["CCFS"].header[f"CCFRV{173-order:03d}"] is not None
-                        else np.nan
+                        (
+                            hdul["CCFS"].header[f"CCFRV{173-order:03d}"]
+                            if hdul["CCFS"].header[f"CCFRV{173-order:03d}"] is not None
+                            else np.nan
+                        )
                         for order in range(122)
                     ]
                 ),
@@ -112,9 +112,11 @@ class NEIDRV4(RV4):
                 "echelle_order": 173 - np.arange(122),
                 "weight": np.array(
                     [
-                        hdul["CCFS"].header[f"CCFWT{173-order:03d}"]
-                        if hdul["CCFS"].header[f"CCFWT{173-order:03d}"] is not None
-                        else np.nan
+                        (
+                            hdul["CCFS"].header[f"CCFWT{173-order:03d}"]
+                            if hdul["CCFS"].header[f"CCFWT{173-order:03d}"] is not None
+                            else np.nan
+                        )
                         for order in range(122)
                     ]
                 ),
