@@ -95,6 +95,8 @@ class NEIDRV4(RV4):
                 "RV": np.array(
                     [
                         hdul["CCFS"].header[f"CCFRV{173-order:03d}"]
+                        if hdul["CCFS"].header[f"CCFRV{173-order:03d}"] is not None
+                        else np.nan
                         for order in range(122)
                     ]
                 ),
@@ -111,6 +113,8 @@ class NEIDRV4(RV4):
                 "weight": np.array(
                     [
                         hdul["CCFS"].header[f"CCFWT{173-order:03d}"]
+                        if hdul["CCFS"].header[f"CCFWT{173-order:03d}"] is not None
+                        else np.nan
                         for order in range(122)
                     ]
                 ),
