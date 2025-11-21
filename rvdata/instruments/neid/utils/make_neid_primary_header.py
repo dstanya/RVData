@@ -119,5 +119,7 @@ def make_base_primary_header(inst_pri_hdr):
     if inst_pri_hdr["OBJECT"] == "Sun":
         phead["TELESCOP"] = "NEID Solar Feed"
         phead["ISSOLAR"] = True
+    else:
+        phead["ISSOLAR"] = False
 
     return phead
