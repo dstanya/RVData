@@ -77,6 +77,10 @@ class NEIDRV2(RV2):
             "description": [],
         }
 
+        # Add PRIMARY header to extension description table
+        ext_table["extension_name"].append("PRIMARY")
+        ext_table["description"].append("EPRV Standard FITS HEADER (no data)")
+
         # Instrument header
         self.set_header("INSTRUMENT_HEADER", hdul["PRIMARY"].header)
         ext_table["extension_name"].append("INSTRUMENT_HEADER")
