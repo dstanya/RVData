@@ -229,8 +229,8 @@ class NEIDRV2(RV2):
         drift_meta = fits.Header(
             {"COMMENT": "NEID drift relative to start of observing session"}
         )
-        self.create_extension("DRIFT", "ImageHDU", header=drift_meta, data=drift_data)
-        ext_table["extension_name"].append("DRIFT")
+        self.create_extension("TRACE1_DRIFT", "ImageHDU", header=drift_meta, data=drift_data)
+        ext_table["extension_name"].append("TRACE1_DRIFT")
         ext_table["description"].append("Instrument drift velocity in km/s")
 
         # Expmeter (316 time stamps, 122 wavelengths)
