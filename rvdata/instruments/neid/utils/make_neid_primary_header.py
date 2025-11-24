@@ -118,6 +118,7 @@ def make_base_primary_header(inst_pri_hdr):
     # Check to see if it is a solar observation and change relevant entries
     if inst_pri_hdr["OBJECT"] == "Sun":
         phead["TELESCOP"] = "NEID Solar Feed"
+        phead["TELEID1"] = "NEID Solar Feed"
         phead["ISSOLAR"] = True
     else:
         phead["ISSOLAR"] = False
