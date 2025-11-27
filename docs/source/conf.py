@@ -8,13 +8,14 @@
 
 import sys
 import os
-
-sys.path.insert(0, os.path.abspath("../../rvdata/"))
+sys.path.insert(0, os.path.abspath("../.."))
+print('sys.path: ',sys.path)
+from rvdata import __version__
 
 project = "RVdata"
 copyright = "2024, BJ Fulton"
 author = "BJ Fulton"
-release = "0.0.1"
+release = __version__
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
