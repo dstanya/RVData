@@ -159,7 +159,7 @@ class RVDataModel(object):
                 elif lvl == 3:
                     import rvdata.core.models.level3
 
-                    method = rvdata.core.models.level4.RV3._read
+                    method = rvdata.core.models.level3.RV3._read
                     method(self, hdu_list)
                 elif lvl == 4:
                     import rvdata.core.models.level4
