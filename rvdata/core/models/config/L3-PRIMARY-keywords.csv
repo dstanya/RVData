@@ -2,6 +2,6 @@ Keyword,Description,Units,Data type,Example Value,FITS required,Default,Inherite
 BLZCORR,Has stellar SED been removed?,N/A,Boolean,True,N,False,N,Y,default is to do this in L3
 LMPCORR,Has lamp SED been removed?,N/A,Boolean,False,N,False,N,Y,default is NOT to do this in L3
 SEDCORR,Has stellar SED been removed?,N/A,Boolean,False,N,False,N,Y,default is NOT to do this in L3
-INTERPMD,interpolation method used to resample input spectrum onto the velocity scale,N/A,String,BINDENSITY,,UNDEFINED,,,default is to use bindensity code from JB Delisle
-FLXNRMMD,flux normalization method,N/A,String,None,,UNDEFINED,,,default is None but include so that other extensions can populate
-DISPCORR,Has wavelength dispersion been corrected?,N/A,Boolean,True,,UNDEFINED,,,default is to correct dispersion
+INTERPMD,interpolation method used to resample input spectrum onto the velocity scale,N/A,String,BINDENSITY,N,UNDEFINED,N,Y,default is to use bindensity code from JB Delisle
+FLXNRMMD,flux normalization method,N/A,String,None,N,UNDEFINED,N,Y,default is None but include so that other extensions can populate
+DISPCORR,Has wavelength dispersion been corrected?,N/A,Boolean,True,N,False,N,Y,default is to correct dispersion
