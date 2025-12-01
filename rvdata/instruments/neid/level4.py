@@ -167,7 +167,7 @@ class NEIDRV4(RV4):
         for order in range(122):
             if (
                 np.isfinite(neid_fsr["fsr_start"].values[order])
-                and (rv_table_data["RV"][order] != None)
+                and (rv_table_data["RV"][order] is not None)
                 and (rv_table_data["RV"][order] != 0)
             ):
                 fsr_pixel_start = int(neid_fsr["fsr_start"].values[order])
