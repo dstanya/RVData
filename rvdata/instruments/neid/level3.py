@@ -110,8 +110,8 @@ class NEIDRV3(RV3):
             phead["BLZCORR"] = True
             phead["LMPCORR"] = True
             phead["SEDCORR"] = False
-            phead["INTERPMD"] = 'BINDENSITY'
-            phead["FLXNRMMD"] = 'None'
+            phead["INTERPMD"] = "BINDENSITY"
+            phead["FLXNRMMD"] = "None"
             phead["DISPCORR"] = True
             self.set_header("PRIMARY", phead)
 
@@ -121,11 +121,10 @@ class NEIDRV3(RV3):
             phead["BLZCORR"] = False
             phead["LMPCORR"] = False
             phead["SEDCORR"] = False
-            phead["INTERPMD"] = 'None'
-            phead["FLXNRMMD"] = 'None'
+            phead["INTERPMD"] = "None"
+            phead["FLXNRMMD"] = "None"
             phead["DISPCORR"] = False
             self.set_header("PRIMARY", phead)
-        
 
         # self.set_header("DRP_CONFIG", OrderedDict(hdul2["CONFIG"].header))
         # self.set_data("DRP_CONFIG", Table(hdul2["CONFIG"].data).to_pandas())
