@@ -191,10 +191,11 @@ def stitch_orders(
     # instrument configuration parameters
     stitch_config = {
         "NEID": {
-            "iordermin": 4,  # First order to include in stitching
-            "iorderflatbreak": 78,  # Order where the flat breaks
-            "iordermax": 116,  # Last order to include in stitching
+            "iordermin": 4,  # First order to include in stitching # TODO use wav limits instead
+            "iorderflatbreak": 78,  # Order where the flat breaks # TODO make function for flat break
+            "iordermax": 116,  # Last order to include in stitching # TODO use wav limits instead
             "nbins": 50000,  # Number of bins for the stitched spectrum
+            # TODO Specify wavstart and waveend and derive nbins from the input data itself
         }
     }
     inst_stitch_config = stitch_config[inst_stitch_config_sel]

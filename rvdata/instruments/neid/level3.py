@@ -93,6 +93,7 @@ class NEIDRV3(RV3):
         # Instrument header
         self.set_header("INSTRUMENT_HEADER", hdul2["PRIMARY"].header)
 
+        # TODO iterate over traces
         # read the wavelength, flux, and blaze data
         sci_flx = hdul2["SCIFLUX"].data  # 4-116 order in NEID out of 122
         sci_wav = hdul2["SCIWAVE"].data
