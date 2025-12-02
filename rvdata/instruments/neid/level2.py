@@ -5,7 +5,6 @@ import os
 from astropy.io import fits
 import numpy as np
 import pandas as pd
-import pdb
 
 # import base class
 from rvdata.core.models.level2 import RV2

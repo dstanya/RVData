@@ -2,8 +2,6 @@ from astropy.io import fits
 
 # from astropy.table import Table
 import numpy as np
-import pandas as pd
-import os
 
 # from collections import OrderedDict
 
