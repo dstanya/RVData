@@ -64,12 +64,11 @@ class NEIDRV4(RV4):
         phead["DATALVL"] = 4
 
         # Add RV specific entries to the primary header
-        phead["BJD_TDB"] = hdul["CCFS"].header["CCFJDMOD"]
+        phead["BJDTDB"] = hdul["CCFS"].header["CCFJDMOD"]
         phead["RV"] = hdul["CCFS"].header["CCFRVMOD"]
-        phead["RVERROR"] = hdul["CCFS"].header["DVRMSMOD"]
+        phead["RVERR"] = hdul["CCFS"].header["DVRMSMOD"]
         phead["RVMETHOD"] = "CCF"
-
-        self.set_header("PRIMARY", phead)
+        phead["SYSVEL"] = hdul["PRIMARY"].header["QRV"]
 
         ext_table["extension_name"].append("PRIMARY")
         ext_table["description"].append("EPRV Standard FITS HEADER (no data)")
@@ -94,7 +93,7 @@ class NEIDRV4(RV4):
                     [
                         (
                             hdul["CCFS"].header[f"CCFRV{173-order:03d}"]
-                            if hdul["CCFS"].header[f"CCFRV{173-order:03d}"] is not None
+                            if not (hdul["CCFS"].data[order] == 0).all()
                             else np.nan
                         )
                         for order in range(122)
@@ -123,12 +122,18 @@ class NEIDRV4(RV4):
             }
         )
 
+        # Add BERV to the primary header and write primary header
+        order_bjd_sort = rv_table_data["BJD_TDB"][np.argsort(rv_table_data["BJD_TDB"])]
+        order_berv_sort = rv_table_data["BC_vel"][np.argsort(rv_table_data["BJD_TDB"])]
+        phead["BERV"] = np.interp(phead["BJDTDB"], order_bjd_sort, order_berv_sort)
+
+        self.set_header("PRIMARY", phead)
+
         # Add information about the wavelength/pixel extents of the RV computation per order
         for order in range(122):
             if (
                 np.isfinite(neid_fsr["fsr_start"].values[order])
-                and (rv_table_data["RV"][order] is not None)
-                and (rv_table_data["RV"][order] != 0)
+                and np.isfinite(rv_table_data["RV"][order])
             ):
                 fsr_pixel_start = int(neid_fsr["fsr_start"].values[order])
                 fsr_pixel_end = int(neid_fsr["fsr_end"].values[order])
