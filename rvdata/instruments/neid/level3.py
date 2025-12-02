@@ -1,14 +1,19 @@
 from astropy.io import fits
+
 # from astropy.table import Table
-# import numpy as np
-import pandas as pd
-import os
+import numpy as np
+
 # from collections import OrderedDict
 
 # import base class
 from rvdata.core.models.level3 import RV3
+
 # from rvdata.core.models.definitions import LEVEL3_EXTENSIONS
+from rvdata.core.models.definitions import LEVEL3_PRIMARY_KEYWORDS
 from rvdata.core.tools import stitch_spectrum
+
+# NEID specific utility functions
+from rvdata.instruments.neid.utils import make_neid_primary_header
 
 
 # NEID Level3 Reader
@@ -54,39 +59,70 @@ class NEIDRV3(RV3):
 
     def _read(self, hdul2: fits.HDUList, **kwargs) -> None:
 
+        # Set up the primary header
+        phead = make_neid_primary_header.make_base_primary_header(hdul2[0].header)
+        phead["DATALVL"] = 3
+
+        # Add L3 specific entries to the primary header
+
+        for i, row in LEVEL3_PRIMARY_KEYWORDS.iterrows():
+            key = row["Keyword"]
+            value = row["Default"]
+            try:
+                if row["Data type"].lower() == "uint":
+                    phead[key] = int(value)
+                elif row["Data type"].lower() == "float":
+                    phead[key] = float(value)
+                elif row["Data type"].lower() == "string":
+                    phead[key] = str(value)
+                elif row["Data type"].lower() == "double":
+                    phead[key] = np.float64(value)
+                elif row["Data type"].lower() == "boolean":
+                    phead[key] = eval(value.capitalize())
+                else:
+                    print(f"Unknown type {row['Data type']} for keyword {key}")
+            except (TypeError, AttributeError, ValueError):
+                print(
+                    f"Cannot convert value {value} for keyword {key} to type {row['Data type']}"
+                )
+
+        self.set_header("PRIMARY", phead)
+
+        # Instrument header
+        self.set_header("INSTRUMENT_HEADER", hdul2["PRIMARY"].header)
+
+        # TODO iterate over traces
         # read the wavelength, flux, and blaze data
         sci_flx = hdul2["SCIFLUX"].data  # 4-116 order in NEID out of 122
         sci_wav = hdul2["SCIWAVE"].data
         sci_blz = hdul2["SCIBLAZE"].data
 
         # stitch the orders
-        st_wave, st_flux = stitch_spectrum.stitch_orders(
-            sci_wav, sci_flx, sci_blz, inst_stitch_config_sel="NEID"
-        )
+        try:
+            st_wave, st_flux = stitch_spectrum.stitch_orders(
+                sci_wav, sci_flx, sci_blz, inst_stitch_config_sel="NEID"
+            )
+            # save the stitched spectrum
+            self.set_data("STITCHED_CORR_TRACE1_FLUX", st_flux)
+            self.set_data("STITCHED_CORR_TRACE1_WAVE", st_wave)
+            phead["BLZCORR"] = True
+            phead["LMPCORR"] = True
+            phead["SEDCORR"] = False
+            phead["INTERPMD"] = "BINDENSITY"
+            phead["FLXNRMMD"] = "None"
+            phead["DISPCORR"] = True
+            self.set_header("PRIMARY", phead)
 
-        # save the stitched spectrum
-        self.set_data("STITCHED_CORR_TRACE1_FLUX", st_flux)
-        self.set_data("STITCHED_CORR_TRACE1_WAVE", st_wave)
-
-        # set the primary header
-        hmap_path = os.path.join(os.path.dirname(__file__), "config/header_map.csv")
-        headmap = pd.read_csv(hmap_path, header=0)
-        phead = fits.PrimaryHDU().header
-        ihead = hdul2["PRIMARY"].header
-        for i, row in headmap.iterrows():
-            skey = row["STANDARD"]
-            neidkey = row["INSTRUMENT"]
-            if pd.notnull(neidkey):
-                neidval = ihead[neidkey]
-            else:
-                neidval = row["DEFAULT"]
-            if pd.notnull(neidval):
-                phead[skey] = neidval
-            else:
-                phead[skey] = None
-
-        self.set_header("PRIMARY", phead)
-        self.set_header("INSTRUMENT_HEADER", ihead)
+        except Exception as e:
+            print(f"Error stitching orders: {e}")
+            st_wave, st_flux = None, None
+            phead["BLZCORR"] = False
+            phead["LMPCORR"] = False
+            phead["SEDCORR"] = False
+            phead["INTERPMD"] = "None"
+            phead["FLXNRMMD"] = "None"
+            phead["DISPCORR"] = False
+            self.set_header("PRIMARY", phead)
 
         # self.set_header("DRP_CONFIG", OrderedDict(hdul2["CONFIG"].header))
         # self.set_data("DRP_CONFIG", Table(hdul2["CONFIG"].data).to_pandas())

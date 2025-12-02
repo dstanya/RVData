@@ -6,10 +6,10 @@ import pandas as pd
 import os
 from collections import OrderedDict
 
-# # import base class
 from rvdata.core.models.level4 import RV4
 
-# from rvdata.core.models.definitions import LEVEL4_EXTENSIONS
+# NEID specific utility functions
+from rvdata.instruments.neid.utils import make_neid_primary_header
 
 
 # KPF Level2 Reader
@@ -53,80 +53,30 @@ class NEIDRV4(RV4):
 
     def _read(self, hdul: fits.HDUList, **kwargs) -> None:
 
-        # Instrument header
-        self.set_header("INSTRUMENT_HEADER", hdul["PRIMARY"].header)
-
-        # Set up the primary header - code from L2 translator to handle OBSMODE dependent entries
-
-        # Set up for obs-mode dependent primary header entries
-        mode_dep_phead = {}
-        catalogue_map = {
-            "CID": "QOBJECT",
-            "CRA": "QRA",
-            "CDEC": "QDEC",
-            "CEQNX": "QEQNX",
-            "CEPCH": "QEPOCH",
-            "CPLX": "QPLX",
-            "CPMR": "QPMRA",
-            "CPMD": "QPMDEC",
-            "CRV": "QRV",
-            "CZ": "QZ",
+        # Set up extension description table
+        ext_table = {
+            "extension_name": [],
+            "description": [],
         }
 
-        # Check observation mode to set number of traces
-        if hdul[0].header["OBS-MODE"] == "HR":
-            fiber_list = ["SCI", "SKY", "CAL"]
-            mode_dep_phead["CLSRC3"] = hdul[0].header["CAL-OBJ"]
-        elif hdul[0].header["OBS-MODE"] == "HE":
-            fiber_list = ["SCI", "SKY"]
-        mode_dep_phead["NUMTRACE"] = len(fiber_list)
+        # Set up the primary header
+        phead = make_neid_primary_header.make_base_primary_header(hdul[0].header)
+        phead["DATALVL"] = 4
 
-        for i_fiber, fiber in enumerate(fiber_list):
-            mode_dep_phead[f"TRACE{i_fiber+1}"] = hdul[0].header[f"{fiber}-OBJ"]
+        # Add RV specific entries to the primary header
+        phead["BJDTDB"] = hdul["CCFS"].header["CCFJDMOD"]
+        phead["RV"] = hdul["CCFS"].header["CCFRVMOD"]
+        phead["RVERR"] = hdul["CCFS"].header["DVRMSMOD"]
+        phead["RVMETHOD"] = "CCF"
+        phead["SYSVEL"] = hdul["PRIMARY"].header["QRV"]
 
-            if hdul[0].header["OBSTYPE"] == "Cal":
-                mode_dep_phead[f"CLSRC{i_fiber+1}"] = hdul[0].header[f"{fiber}-OBJ"]
+        ext_table["extension_name"].append("PRIMARY")
+        ext_table["description"].append("EPRV Standard FITS HEADER (no data)")
 
-            if hdul[0].header[f"{fiber}-OBJ"] == hdul[0].header["QOBJECT"]:
-                for pkey, ikey in catalogue_map.items():
-                    mode_dep_phead[f"{pkey}{i_fiber+1}"] = hdul[0].header[ikey]
-                mode_dep_phead[f"CSRC{i_fiber+1}"] = "GAIADR2"
-
-        # Set up data standard primary header
-        hmap_path = os.path.join(os.path.dirname(__file__), "config/header_map.csv")
-        headmap = pd.read_csv(hmap_path, header=0)
-
-        phead = fits.PrimaryHDU().header
-        ihead = self.headers["INSTRUMENT_HEADER"]
-        for i, row in headmap.iterrows():
-            skey = row["STANDARD"]
-            instkey = row["INSTRUMENT"]
-            if row["MODE_DEP"] != "Y":
-                if pd.notnull(instkey):
-                    instval = ihead[instkey]
-                else:
-                    instval = row["DEFAULT"]
-                if pd.notnull(instval):
-                    phead[skey] = instval
-                else:
-                    phead[skey] = None
-            else:
-                if skey in mode_dep_phead.keys():
-                    phead[skey] = mode_dep_phead[skey]
-                else:
-                    continue
-
-        # Add instrument era
-        eramap = pd.read_csv(
-            os.path.join(os.path.dirname(__file__), "config/neid_inst_eras.csv")
-        )
-        era_time_diffs = phead["JD_UTC"] - eramap["startdate"].values
-        era = eramap["era"].values[
-            np.argmin(era_time_diffs[np.where(era_time_diffs >= 0)[0]])
-        ]
-        phead["INSTERA"] = era
-
-        self.set_header("PRIMARY", phead)
+        # Instrument header
+        self.set_header("INSTRUMENT_HEADER", hdul["PRIMARY"].header)
+        ext_table["extension_name"].append("INSTRUMENT_HEADER")
+        ext_table["description"].append("Primary header of native instrument file")
 
         # RV1 - turn the CCFS extension header into a table
 
@@ -141,7 +91,11 @@ class NEIDRV4(RV4):
                 ),
                 "RV": np.array(
                     [
-                        hdul["CCFS"].header[f"CCFRV{173-order:03d}"]
+                        (
+                            hdul["CCFS"].header[f"CCFRV{173-order:03d}"]
+                            if not (hdul["CCFS"].data[order] == 0).all()
+                            else np.nan
+                        )
                         for order in range(122)
                     ]
                 ),
@@ -157,18 +111,29 @@ class NEIDRV4(RV4):
                 "echelle_order": 173 - np.arange(122),
                 "weight": np.array(
                     [
-                        hdul["CCFS"].header[f"CCFWT{173-order:03d}"]
+                        (
+                            hdul["CCFS"].header[f"CCFWT{173-order:03d}"]
+                            if hdul["CCFS"].header[f"CCFWT{173-order:03d}"] is not None
+                            else np.nan
+                        )
                         for order in range(122)
                     ]
                 ),
             }
         )
 
+        # Add BERV to the primary header and write primary header
+        order_bjd_sort = rv_table_data["BJD_TDB"][np.argsort(rv_table_data["BJD_TDB"])]
+        order_berv_sort = rv_table_data["BC_vel"][np.argsort(rv_table_data["BJD_TDB"])]
+        phead["BERV"] = np.interp(phead["BJDTDB"], order_bjd_sort, order_berv_sort)
+
+        self.set_header("PRIMARY", phead)
+
+        # Add information about the wavelength/pixel extents of the RV computation per order
         for order in range(122):
             if (
                 np.isfinite(neid_fsr["fsr_start"].values[order])
-                and (rv_table_data["RV"][order] is not None)
-                and (rv_table_data["RV"][order] != 0)
+                and np.isfinite(rv_table_data["RV"][order])
             ):
                 fsr_pixel_start = int(neid_fsr["fsr_start"].values[order])
                 fsr_pixel_end = int(neid_fsr["fsr_end"].values[order])
@@ -184,6 +149,10 @@ class NEIDRV4(RV4):
                 rv_table_data["pixel_end"][order] = fsr_pixel_end
 
         self.set_data("RV1", pd.DataFrame(rv_table_data))
+        ext_table["extension_name"].append("RV1")
+        ext_table["description"].append(
+            "Order-wise RV measurement table for NEID Science fiber trace"
+        )
 
         # CCF extension
 
@@ -202,12 +171,73 @@ class NEIDRV4(RV4):
         self.create_extension(
             "CCF1", "ImageHDU", data=hdul["CCFS"].data, header=ccf_header
         )
+        ext_table["extension_name"].append("CCF1")
+        ext_table["description"].append("Order-wise CCFs for NEID Science fiber trace")
 
         # Diagnostics extension - for now just put in the activity extension directly
 
+        diagnostics_table_data = {"metric_name": [], "value": [], "uncertainty": []}
+
+        # Activity indicators in NEID extension to include in diagnostics table
+        neid_activity_use = {
+            "CaIIHK": "CaIIHK",
+            "HeI_1": "HeI",
+            "NaI": "NaI",
+            "Ha06_1": "Halpha06",
+            "Ha16_1": "Halpha16",
+            "CaI_1": "CaI",
+            "CaIRT1": "CaIRT1",
+            "CaIRT2": "CaIRT2",
+            "CaIRT3": "CaIRT3",
+            "NaINIR": "NaINIR",
+            "PaDelta": "PaDelta",
+            "Mn539": "Mn539",
+        }
+
+        for index_name_neid, index_name_std in neid_activity_use.items():
+            # Location in the NEID table with that index
+            table_loc = np.where(hdul["ACTIVITY"].data["INDEX"] == index_name_neid)[0]
+
+            diagnostics_table_data["metric_name"].append(index_name_std)
+            diagnostics_table_data["value"].append(
+                hdul["ACTIVITY"].data["VALUE"][table_loc][0]
+            )
+            diagnostics_table_data["uncertainty"].append(
+                hdul["ACTIVITY"].data["UNCERTAINTY"][table_loc][0]
+            )
+
+            # Also output the telluric corrected version
+            table_loc = np.where(
+                hdul["ACTIVITY"].data["INDEX"] == (index_name_neid + "_tellcorr")
+            )[0]
+
+            diagnostics_table_data["metric_name"].append(index_name_std + "_tellcorr")
+            diagnostics_table_data["value"].append(
+                hdul["ACTIVITY"].data["VALUE"][table_loc][0]
+            )
+            diagnostics_table_data["uncertainty"].append(
+                hdul["ACTIVITY"].data["UNCERTAINTY"][table_loc][0]
+            )
+
+        # Add CCF activity indicators as well
+        diagnostics_table_data["metric_name"].append("CCF_FWHM")
+        diagnostics_table_data["value"].append(hdul["CCFS"].header["FWHMMOD"])
+        diagnostics_table_data["uncertainty"].append(np.nan)
+
+        diagnostics_table_data["metric_name"].append("CCF_BIS")
+        diagnostics_table_data["value"].append(hdul["CCFS"].header["BISMOD"])
+        diagnostics_table_data["uncertainty"].append(hdul["CCFS"].header["EBISMOD"])
+
+        # Output the diagnostics table
         self.create_extension(
             "DIAGNOSTICS1",
             "BinTableHDU",
-            data=hdul["ACTIVITY"].data,
-            header=hdul["ACTIVITY"].header,
+            data=pd.DataFrame(diagnostics_table_data),
         )
+        ext_table["extension_name"].append("DIAGNOSTICS1")
+        ext_table["description"].append(
+            "Table of activity diagnostics for NEID science fiber trace"
+        )
+
+        # Set extension description table
+        self.set_data("EXT_DESCRIPT", pd.DataFrame(ext_table))

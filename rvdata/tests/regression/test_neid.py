@@ -1,0 +1,61 @@
+import requests
+import os
+from rvdata.core.models.level2 import RV2
+from rvdata.core.models.level4 import RV4
+
+from rvdata.tests.regression.compliance import check_l2_extensions, check_l2_header
+from rvdata.tests.regression.compliance import check_l4_extensions, check_l4_header
+
+file_urls = {
+    "NEID": {
+        "NATIVE_L2": "https://zenodo.org/records/17794590/files/neidL2_20231010T020006.fits?download=1",
+    }
+}
+
+
+def download_file(url, filename):
+    response = requests.get(url)
+    response.raise_for_status()  # Check if the request was successful
+    with open(filename, "wb") as file:
+        file.write(response.content)
+
+
+def download_files():
+    native_l2_file = "neid_L2.fits"
+    if not os.path.exists(native_l2_file):
+        download_file(file_urls["NEID"]["NATIVE_L2"], native_l2_file)
+
+    return native_l2_file
+
+
+def test_neid():
+    native_l2_file = download_files()
+
+    # Check L2
+    neidl2 = RV2.from_fits(native_l2_file, instrument="NEID")
+    standard_l2_file = "./neid_L2_standard.fits"
+    neidl2.to_fits(standard_l2_file)
+    neidl2_obj = RV2.from_fits(standard_l2_file)
+
+    check_l2_extensions(standard_l2_file)
+    check_l2_header(neidl2_obj.headers["PRIMARY"])
+
+    # Check L4
+    neidl4 = RV4.from_fits(native_l2_file, instrument="NEID")
+    standard_l4_file = "./neid_L4_standard.fits"
+    neidl4.to_fits(standard_l4_file)
+    neidl4_obj = RV4.from_fits(standard_l4_file)
+
+    check_l4_extensions(standard_l4_file)
+    check_l4_header(neidl4_obj.headers["PRIMARY"])
+
+
+def test_neid_benchmark(benchmark):
+    # run test_kpf() once to download the files
+    _ = download_files
+    # now run it again with benchmark
+    benchmark(test_neid)
+
+
+if __name__ == "__main__":
+    test_neid()

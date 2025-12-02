@@ -129,8 +129,8 @@ class RVDataModel(object):
                 if isinstance(hdu, fits.PrimaryHDU):
                     self.headers[hdu.name] = hdu.header
                 elif isinstance(hdu, fits.BinTableHDU):
-                    t = Table.read(hdu)
                     if "RECEIPT" in hdu.name:
+                        t = Table.read(hdu)
                         # Table contains the RECEIPT
                         df: pd.DataFrame = t.to_pandas()
                         # TODO: get receipt columns from core.models.config.BASE-RECEIPT-columns.csv
@@ -159,7 +159,7 @@ class RVDataModel(object):
                 elif lvl == 3:
                     import rvdata.core.models.level3
 
-                    method = rvdata.core.models.level4.RV3._read
+                    method = rvdata.core.models.level3.RV3._read
                     method(self, hdu_list)
                 elif lvl == 4:
                     import rvdata.core.models.level4
@@ -204,9 +204,11 @@ class RVDataModel(object):
                     elif row["Data type"].lower() == "double":
                         self.headers["PRIMARY"][key] = np.float64(value)
                     elif row["Data type"].lower() == "boolean":
-                        self.headers['PRIMARY'][key] = bool(value)
+                        self.headers["PRIMARY"][key] = bool(value)
                     else:
-                        warnings.warn(f"Unknown type {row['Data type']} for keyword {key}")
+                        warnings.warn(
+                            f"Unknown type {row['Data type']} for keyword {key}"
+                        )
                 except (TypeError, AttributeError, ValueError):
                     warnings.warn(
                         f"Cannot convert value {value} for keyword {key} to type {row['Data type']}"
