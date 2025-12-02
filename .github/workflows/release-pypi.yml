@@ -3,16 +3,7 @@ name: Publish to PyPI on Release
 on:
   release:
     types: [published]
-  workflow_dispatch:
-    inputs:
-      test_pypi:
-        description: 'Publish to TestPyPI instead of PyPI (for testing)'
-        required: false
-        default: 'false'
-        type: choice
-        options:
-          - 'false'
-          - 'true'
+  workflow_dispatch: {}
 
 permissions:
   contents: read
@@ -42,21 +33,12 @@ jobs:
 
       - name: Publish to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
-        if: ${{ github.event.inputs.test_pypi != 'true' }}
         # Using Trusted Publishing (OIDC) - no password needed
-        # Trusted Publisher is already configured for 'EPRV_Data_Standard' on PyPI
+        # Trusted Publisher is already configured for 'rv-data-standard' on PyPI
         # 
         # If you need to use API token instead, uncomment the lines below:
         # with:
         #   password: ${{ secrets.PYPI_API_TOKEN }}
         #   verbose: true
-
-      - name: Publish to TestPyPI
-        uses: pypa/gh-action-pypi-publish@release/v1
-        if: ${{ github.event.inputs.test_pypi == 'true' }}
-        with:
-          repository-url: https://test.pypi.org/legacy/
-          password: ${{ secrets.TEST_PYPI_API_TOKEN }}
-          verbose: true
 
 

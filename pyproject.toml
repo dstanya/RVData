@@ -3,7 +3,7 @@ requires = ["setuptools", "wheel", "sphinx", "setuptools_scm"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "EPRV_Data_Standard"
+name = "rv-data-standard"
 dynamic = ["version"]
 description = "EPRV Data Standardization Project"
 authors = [
