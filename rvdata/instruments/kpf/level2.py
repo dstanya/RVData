@@ -267,6 +267,7 @@ class KPFRV2(RV2):
             else:
                 phead[skey] = None
 
+        phead["ISSOLAR"] = ihead["OBJECT"].lower() == "socal"
         self.set_header("PRIMARY", phead)
 
         # overwrite EXT_DESCRIPT as a DataFrame, dropping the Comments column

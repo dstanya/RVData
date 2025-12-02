@@ -1,18 +1,60 @@
-ext_name,description
-PRIMARY,The primary header containing the keywords following the standard format
-INSTRUMENT_HEADER, The original instrument header
-RECEIPT, The list of operations performed on this file
-DRP_CONFIG, Pipeline details to go from the raw file to this file
-EXT_DESCRIPT, Contains the description of all the extensions in the file
-ORDER_TABLE, Table capturing the wavelength extent of each order
-TRACEI_FLUX, The flux measured in trace i
-TRACEI_WAVE, The wavelength associated to the flux in trace i
-TRACEI_VAR, The variance for trace i
-TRACEI_BLAZE, The blaze for trace i
-TRACEI_QUALDATA, The data quality array for trace i
-TRACEI_DISP, The dispersion for trace i
-TRACEI_DRIFT, The drift for trace i
-BARYCORR_KMS, The barycentric correction in km/s
-BARYCORR_Z, The barycentric correction in redshift 
-BJD_TDB,Photon weighted midpoint
-EXPMETER, The exposure meter
+Name,Description,Required
+PRIMARY,The primary header containing the keywords following the standard format,True
+INSTRUMENT_HEADER, The original instrument header,True
+RECEIPT, The list of operations performed on this file,True
+DRP_CONFIG, Pipeline details to go from the raw file to this file,True
+EXT_DESCRIPT, Contains the description of all the extensions in the file,True
+ORDER_TABLE, Table capturing the wavelength extent of each order,True
+TRACE1_FLUX, The flux measured in trace 1,True
+TRACE1_WAVE, The wavelength associated to the flux in trace 1,True
+TRACE1_VAR, The variance for trace 1,True
+TRACE1_BLAZE, The blaze for trace 1,True
+TRACE1_QUALITY, The data quality array for trace 1,True
+TRACE1_TELL_COR_FLUX, The telluric corrected flux for trace 1,False
+TRACE1_TELL_COR_VAR, The variance of the telluric corrected flux for trace 1,False
+TRACE1_TELL_COR_QUALITY, The data quality of the telluric corrected flux for trace 1,False
+TRACE1_SKYSUB_FLUX, The sky subtracted flux for trace 1,False
+TRACE1_SKYSUB_VAR, The variance of the sky subtracted flux for trace 1,False
+TRACE1_SKYSUB_QUALITY, The data quality of the sky subtracted flux for trace 1,False
+TRACE2_FLUX, The flux measured in trace 2,True
+TRACE2_WAVE, The wavelength associated to the flux in trace 2,True
+TRACE2_VAR, The variance for trace 2,True
+TRACE2_BLAZE, The blaze for trace 2,True
+TRACE2_QUALITY, The data quality array for trace 2,True
+TRACE2_TELL_COR_FLUX, The telluric corrected flux for trace 2,False
+TRACE2_TELL_COR_VAR, The variance of the telluric corrected flux for trace 2,False
+TRACE2_TELL_COR_QUALITY, The data quality of the telluric corrected flux for trace 2,False
+TRACE2_SKYSUB_FLUX, The sky subtracted flux for trace 2,False
+TRACE2_SKYSUB_VAR, The variance of the sky subtracted flux for trace 2,False
+TRACE2_SKYSUB_QUALITY, The data quality of the sky subtracted flux for trace 2,False
+TRACE3_FLUX, The flux measured in trace 3,False
+TRACE3_WAVE, The wavelength associated to the flux in trace3,False
+TRACE3_VAR, The variance for trace 3,False
+TRACE3_BLAZE, The blaze for trace 3,False
+TRACE3_QUALITY, The data quality array for trace 3,False
+TRACE3_TELL_COR_FLUX, The telluric corrected flux for trace 3,False
+TRACE3_TELL_COR_VAR, The variance of the telluric corrected flux for trace 3,False
+TRACE3_TELL_COR_QUALITY, The data quality of the telluric corrected flux for trace 3,False
+TRACE3_SKYSUB_FLUX, The sky subtracted flux for trace 3,False
+TRACE3_SKYSUB_VAR, The variance of the sky subtracted flux for trace 3,False
+TRACE3_SKYSUB_QUALITY, The data quality of the sky subtracted flux for trace 3,False
+TRACE4_FLUX, The flux measured in trace 4,False
+TRACE4_WAVE, The wavelength associated to the flux in trace 4,False
+TRACE4_VAR, The variance for trace 4,False
+TRACE4_BLAZE, The blaze for trace 4,False
+TRACE4_QUALITY, The data quality array for trace 4,False
+TRACE4_TELL_COR_FLUX, The telluric corrected flux for trace 4,False
+TRACE4_TELL_COR_VAR, The variance of the telluric corrected flux for trace 4,False
+TRACE4_TELL_COR_QUALITY, The data quality of the telluric corrected flux for trace 4,False
+TRACE4_SKYSUB_FLUX, The sky subtracted flux for trace 4,False
+TRACE4_SKYSUB_VAR, The variance of the sky subtracted flux for trace 4,False
+TRACE4_SKYSUB_QUALITY, The data quality of the sky subtracted flux for trace 4,False
+TRACE2_DRIFT, The drift for trace 2,False
+TRACE3_DRIFT, The drift for trace 3,False
+TRACE4_DRIFT, The drift for trace 4,False
+BARYCORR_KMS, The barycentric correction in km/s,True
+BARYCORR_Z, The barycentric correction in redshift,True
+BJD_TDB,Photon weighted midpoint,True
+EXPMETER, The exposure meter,False
+GUIDINGIMAGE, Images from the guiding camera,False
+PUPILIMAGE, Image from the pupil,False

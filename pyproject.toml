@@ -18,7 +18,8 @@ dependencies = [
     "pandas",
     "GitPython",
     "specutils",
-    "astroquery"
+    "astroquery",
+    "jplephem"
 ]
 
 # Optional dependencies
