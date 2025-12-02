@@ -3,7 +3,7 @@ API
 
 Documentation for the core code
 
-.. automodule:: core
+.. automodule:: rvdata.core
    :members:
    :undoc-members:
    :show-inheritance:
