@@ -1,7 +1,7 @@
 from astropy.io import fits
 
 # from astropy.table import Table
-# import numpy as np
+import numpy as np
 import pandas as pd
 import os
 
@@ -11,6 +11,7 @@ import os
 from rvdata.core.models.level3 import RV3
 
 # from rvdata.core.models.definitions import LEVEL3_EXTENSIONS
+from rvdata.core.models.definitions import LEVEL3_PRIMARY_KEYWORDS
 from rvdata.core.tools import stitch_spectrum
 
 # NEID specific utility functions
@@ -65,6 +66,27 @@ class NEIDRV3(RV3):
         phead["DATALVL"] = 3
 
         # Add L3 specific entries to the primary header
+
+        for i, row in LEVEL3_PRIMARY_KEYWORDS.iterrows():
+            key = row["Keyword"]
+            value = row["Default"]
+            try:
+                if row["Data type"].lower() == "uint":
+                    phead[key] = int(value)
+                elif row["Data type"].lower() == "float":
+                    phead[key] = float(value)
+                elif row["Data type"].lower() == "string":
+                    phead[key] = str(value)
+                elif row["Data type"].lower() == "double":
+                    phead[key] = np.float64(value)
+                elif row["Data type"].lower() == "boolean":
+                    phead[key] = eval(value.capitalize())
+                else:
+                    print(f"Unknown type {row['Data type']} for keyword {key}")
+            except (TypeError, AttributeError, ValueError):
+                print(
+                    f"Cannot convert value {value} for keyword {key} to type {row['Data type']}"
+                )
 
         self.set_header("PRIMARY", phead)
 
