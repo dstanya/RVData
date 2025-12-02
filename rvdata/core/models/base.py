@@ -129,8 +129,8 @@ class RVDataModel(object):
                 if isinstance(hdu, fits.PrimaryHDU):
                     self.headers[hdu.name] = hdu.header
                 elif isinstance(hdu, fits.BinTableHDU):
-                    t = Table.read(hdu)
                     if "RECEIPT" in hdu.name:
+                        t = Table.read(hdu)
                         # Table contains the RECEIPT
                         df: pd.DataFrame = t.to_pandas()
                         # TODO: get receipt columns from core.models.config.BASE-RECEIPT-columns.csv
