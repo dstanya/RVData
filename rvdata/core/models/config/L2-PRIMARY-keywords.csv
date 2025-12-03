@@ -20,7 +20,7 @@ DATE-OBS,Date/time at start of exposure,UTC,String,"2018-04-26T15:53:13.456",UNK
 JD_UTC,Julian date of DATE-OBS,day,Double,2450000,UNDEFINED,Y,
 EXPTIME,Exposure time,s,Float,29.43664,UNDEFINED,Y,
 TRACE1 ... TRACE#,Type of object in trace 1 to #,N/A,String,"SCI or CAL or SKY",UNKNOWN,Y,"Can be expanded to multiple keywords indexed 1 to #"
-CLSRC1 ... CLSRC#,Name of calibration source in trace 1 to # [if used],N/A,String,"LFC or Etalon or UrNe",UNKNOWN,Y,"Can be expanded to multiple keywords indexed 1 to #"
+CLSRC1 ... CLSRC#,Name of calibration source in trace 1 to # [if used],N/A,String,"LFC or Etalon or UNe",UNKNOWN,Y,"Can be expanded to multiple keywords indexed 1 to #"
 CSRC1 ... CSRC#,Catalog source for object in trace 1 to #,N/A,String,"GaiaDR2",UNKNOWN,Y,"Can be expanded to multiple keywords indexed 1 to #; Should define hierarchy of catalogs"
 CID1 ... CID#,Catalog name/designation for object in trace 1 to #,N/A,String,"DR2 NNNNNNNNNNNNNNNNNNN",UNKNOWN,Y,"Can be expanded to multiple keywords indexed 1 to #"
 CRA1 ... CRA#,Catalog right ascension for object in trace 1 to #,sexagesimal,String,"HH:MM:SS.sss",UNKNOWN,Y,"Can be expanded to multiple keywords indexed 1 to #"
@@ -29,8 +29,8 @@ CEQNX1 ... CEQNX#,Catalog equinox for object in trace 1 to #,yr,Float,2000,UNDEF
 CEPCH1 ... CEPCH#,Catalog epoch for object in trace 1 to #,yr,Float,2015.5,UNDEFINED,Y,"Can be expanded to multiple keywords indexed 1 to #"
 CRV1 ... CRV#,Catalog Systemic RV for for object in trace 1 to #,km/s,Float,45.654,UNDEFINED,Y,"Can be expanded to multiple keywords indexed 1 to #"
 CPLX1 ... CPLX#,Catalog parallax for object in trace 1 to #,mas,Float,20.45,,N,"Can be expanded to multiple keywords indexed 1 to #"
-CPMR1 ... CPMR#,Catalog proper motion RA for object in trace 1 to #,�/yr,Float,0.0345,,N,"Can be expanded to multiple keywords indexed 1 to #"
-CPMD1 ... CPMD#,Catalog proper motion DEC for object in trace 1 to #,�/yr,Float,0.345,,N,"Can be expanded to multiple keywords indexed 1 to #"
+CPMR1 ... CPMR#,Catalog proper motion RA for object in trace 1 to #,arcsec/yr,Float,0.0345,,N,"Can be expanded to multiple keywords indexed 1 to #"
+CPMD1 ... CPMD#,Catalog proper motion DEC for object in trace 1 to #,arcsec/yr,Float,0.345,,N,"Can be expanded to multiple keywords indexed 1 to #"
 CZ1 ... CZ#,Catalog Z for for object in trace 1 to #,N/A,Float,0.00000454,,N,"Can be expanded to multiple keywords indexed 1 to #"
 CCLRN1 ... CCLRN#,Catalog color 1 - color 2 name for object in trace 1 to #,N/A,String,"Gaia B-R",,N,"Can be expanded to multiple keywords indexed 1 to #"
 CCLR1 ... CCLR#,Catalog color 1 - color 2 for object in trace 1 to #,mag,Float,0.47,,N,"Can be expanded to multiple keywords indexed 1 to #"
