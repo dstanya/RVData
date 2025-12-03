@@ -32,6 +32,8 @@ def parse_value_to_datatype(keyword: str, datatype: str, value):
     """
 
     try:
+        if value is None:
+            return None
         if datatype.lower() == "uint":
             return int(value)
         elif datatype.lower() == "float":
