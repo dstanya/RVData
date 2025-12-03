@@ -4,7 +4,7 @@ HDU,Name,DataType,MinBetDepth,Multiplicity,Required,Description,Comments
 2,RECEIPT,BinTableHDU,,False,True,Table of operations that have been performed on this file,
 3,DRP_CONFIG,BinTableHDU,,False,True,Pipeline details (settings etc) to go from native data to L2,
 4,EXT_DESCRIPT,BinTableHDU,,False,True,Table describing contents of each extension,
-5,ORDER_TABLE,BinTableHDU,,TRUE,TRUE,Table capturing the wavelength extent of each order, Required columns: physical echelle order; index echelle order; start wavelength [64bit]; end wavelength [64bit]
+5,ORDER_TABLE,BinTableHDU,,TRUE,TRUE,Table capturing the wavelength extent of each order in Trace 1, Required columns: physical echelle order; index echelle order; start wavelength [64bit]; end wavelength [64bit]
 6,TRACE1_FLUX,ImageHDU,,True,True,Flux in trace 1,
 7,TRACE1_WAVE,ImageHDU,64,True,True,wavelength solution for trace 1,
 8,TRACE1_VAR,ImageHDU,,True,True,variance for trace 1,
