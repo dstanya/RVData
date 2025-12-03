@@ -8,7 +8,7 @@ from rvdata.tests.regression.compliance import check_l4_extensions, check_l4_hea
 
 file_urls = {
     "NEID": {
-        "NATIVE_L2": "https://zenodo.org/records/17794590/files/neidL2_20231010T020006.fits?download=1",
+        "NATIVE_L2": "http://grinnell.as.arizona.edu/~rvdata/neid/neidL2_20231010T020006.fits",
     }
 }
 
