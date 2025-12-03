@@ -1,10 +1,5 @@
 from astropy.io import fits
 
-# from astropy.table import Table
-import numpy as np
-
-# from collections import OrderedDict
-
 # import base class
 from rvdata.core.models.level3 import RV3
 
