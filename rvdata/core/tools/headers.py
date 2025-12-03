@@ -32,7 +32,9 @@ def parse_value_to_datatype(keyword: str, datatype: str, value):
     """
 
     try:
-        if value is None or value.lower() == "undefined":
+        if value is None:
+            return None
+        if isinstance(value, str) and value.lower() == "undefined":
             return None
         if datatype.lower() == "uint":
             return int(value)
