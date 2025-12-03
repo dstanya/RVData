@@ -78,7 +78,7 @@ class NEIDRV3(RV3):
                 elif row["Data type"].lower() == "double":
                     phead[key] = np.float64(value)
                 elif row["Data type"].lower() == "boolean":
-                    phead[key] = eval(value.capitalize())
+                    phead[key] = value.upper() == 'TRUE'
                 else:
                     print(f"Unknown type {row['Data type']} for keyword {key}")
             except (TypeError, AttributeError, ValueError):
@@ -115,7 +115,6 @@ class NEIDRV3(RV3):
 
         except Exception as e:
             print(f"Error stitching orders: {e}")
-            st_wave, st_flux = None, None
             phead["BLZCORR"] = False
             phead["LMPCORR"] = False
             phead["SEDCORR"] = False
