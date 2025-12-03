@@ -195,10 +195,7 @@ class RVDataModel(object):
                 parsed_value = parse_value_to_datatype(
                     key, row["Data type"], value
                 )
-                if parsed_value is None:
-                    continue
-                else:
-                    self.headers["PRIMARY"][key] = parsed_value
+                self.headers["PRIMARY"][key] = parsed_value
 
         # compute MD5 sum of source file and write it into a receipt entry for tracking.
         # Note that MD5 sum has known security vulnerabilities, but we are only using
