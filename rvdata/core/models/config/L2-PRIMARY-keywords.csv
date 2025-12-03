@@ -4,8 +4,8 @@ ORGANIZA,"Organization the data belongs to, for licensing purposes",N/A,String,"
 ORIGIN,Entity that created this file,N/A,String,"ESO or NOIRLab",,N,
 DATALVL,Data Product Base Level,N/A,String,"L2 or L3",UNKNOWN,Y,
 OBSERVER,Observer,N/A,String,"Bender",UNKNOWN,Y,
-PROGRAM,Observing program name,N/A,String,"Bender01",UNKNOWN,N*,"For data filtering and attribution; default to Unknown if it doesnt exist"
-PINAME,Program PI Name,N/A,String,"Bender",UNKNOWN,N*,"For data filtering and attribution; default to Unknown if it doesnt exist"
+PROGRAM,Observing program name,N/A,String,"Bender01",UNKNOWN,N*,"For data filtering and attribution; default to Unknown if it does not exist"
+PINAME,Program PI Name,N/A,String,"Bender",UNKNOWN,N*,"For data filtering and attribution; default to Unknown if it does not exist"
 OBSTYPE,Observation type,N/A,String,"Sci or Eng",UNKNOWN,Y,
 OBSMODE,Observing mode,N/A,String,"HR or HE",,N,
 READMODE,Readout Mode,N/A,String,"Fast; Slow; UTR; FowlerN; or CDS",,N,

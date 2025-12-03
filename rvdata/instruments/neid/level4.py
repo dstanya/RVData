@@ -138,10 +138,10 @@ class NEIDRV4(RV4):
                 fsr_pixel_start = int(neid_fsr["fsr_start"].values[order])
                 fsr_pixel_end = int(neid_fsr["fsr_end"].values[order])
 
-                rv_table_data["wave_start"][order] = hdul["sciwave"].data[
+                rv_table_data["wave_start"][order] = hdul["SCIWAVE"].data[
                     order, fsr_pixel_start
                 ]
-                rv_table_data["wave_end"][order] = hdul["sciwave"].data[
+                rv_table_data["wave_end"][order] = hdul["SCIWAVE"].data[
                     order, fsr_pixel_end
                 ]
 

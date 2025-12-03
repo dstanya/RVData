@@ -52,7 +52,7 @@ def test_neid():
 
 def test_neid_benchmark(benchmark):
     # run test_kpf() once to download the files
-    _ = download_files
+    _ = download_files()
     # now run it again with benchmark
     benchmark(test_neid)
 

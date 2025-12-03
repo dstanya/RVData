@@ -59,7 +59,7 @@ def test_kpf():
 
 def test_kpf_benchmark(benchmark):
     # run test_kpf() once to download the files
-    _ = download_files
+    _ = download_files()
     # now run it again with benchmark
     benchmark(test_kpf)
 
