@@ -3,6 +3,7 @@ import warnings
 
 import numpy as np
 
+
 def to_ascii_safe(input_string):
     # Normalize the string to NFKD form
     normalized_string = unicodedata.normalize("NFKD", input_string)
@@ -29,7 +30,7 @@ def parse_value_to_datatype(keyword: str, datatype: str, value):
     Returns
     - Converted value of the requested type
     """
-    
+
     try:
         if datatype.lower() == "uint":
             return int(value)
@@ -43,11 +44,9 @@ def parse_value_to_datatype(keyword: str, datatype: str, value):
             if isinstance(value, bool):
                 return value
             elif isinstance(value, str):
-                return (value[0].lower() == 't')
+                return value[0].lower() == "t"
         else:
-            warnings.warn(
-                f"Unknown type {datatype} for keyword {keyword}"
-            )
+            warnings.warn(f"Unknown type {datatype} for keyword {keyword}")
     except (TypeError, AttributeError, ValueError):
         warnings.warn(
             f"Cannot convert value {value} for keyword {keyword} to type {datatype}"
