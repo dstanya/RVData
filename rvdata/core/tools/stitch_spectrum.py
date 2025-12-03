@@ -1,6 +1,6 @@
 import numpy as np
 from astropy import units as u
-from specutils import Spectrum1D
+from specutils import Spectrum
 from specutils.manipulation import FluxConservingResampler
 from scipy.interpolate import interp1d
 
@@ -133,7 +133,7 @@ def resample_flux_conserving(sci_wav, sci_dflx, spec_mask, nbins):
         wave = sci_wav[iorder, :] * u.AA
         flux = sci_dflx[iorder, :] * u.Unit("adu")  # or the correct unit
         mask = spec_mask[iorder, :]  # boolean mask for NaNs or bad pixels
-        orders.append(Spectrum1D(spectral_axis=wave, flux=flux, mask=mask))
+        orders.append(Spectrum(spectral_axis=wave, flux=flux, mask=mask))
 
     # Define a common output grid
 
@@ -191,10 +191,11 @@ def stitch_orders(
     # instrument configuration parameters
     stitch_config = {
         "NEID": {
-            "iordermin": 4,  # First order to include in stitching
-            "iorderflatbreak": 78,  # Order where the flat breaks
-            "iordermax": 116,  # Last order to include in stitching
+            "iordermin": 4,  # First order to include in stitching # TODO use wav limits instead
+            "iorderflatbreak": 78,  # Order where the flat breaks # TODO make function for flat break
+            "iordermax": 116,  # Last order to include in stitching # TODO use wav limits instead
             "nbins": 50000,  # Number of bins for the stitched spectrum
+            # TODO Specify wavstart and waveend and derive nbins from the input data itself
         }
     }
     inst_stitch_config = stitch_config[inst_stitch_config_sel]

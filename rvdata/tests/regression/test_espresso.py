@@ -92,7 +92,7 @@ def test_espresso():
 
 def test_espresso_benchmark(benchmark):
     # run test_kpf() once to download the files
-    _ = download_files
+    _ = download_files()
     # now run it again with benchmark
     benchmark(test_espresso)
 
