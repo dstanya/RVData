@@ -11,6 +11,7 @@ from rvdata.core.models.level3 import RV3
 # from rvdata.core.models.definitions import LEVEL3_EXTENSIONS
 from rvdata.core.models.definitions import LEVEL3_PRIMARY_KEYWORDS
 from rvdata.core.tools import stitch_spectrum
+from rvdata.core.tools.headers import parse_value_to_datatype
 
 # NEID specific utility functions
 from rvdata.instruments.neid.utils import make_neid_primary_header
@@ -65,26 +66,10 @@ class NEIDRV3(RV3):
 
         # Add L3 specific entries to the primary header
 
-        for i, row in LEVEL3_PRIMARY_KEYWORDS.iterrows():
+        for _, row in LEVEL3_PRIMARY_KEYWORDS.iterrows():
             key = row["Keyword"]
             value = row["Default"]
-            try:
-                if row["Data type"].lower() == "uint":
-                    phead[key] = int(value)
-                elif row["Data type"].lower() == "float":
-                    phead[key] = float(value)
-                elif row["Data type"].lower() == "string":
-                    phead[key] = str(value)
-                elif row["Data type"].lower() == "double":
-                    phead[key] = np.float64(value)
-                elif row["Data type"].lower() == "boolean":
-                    phead[key] = value.upper() == 'TRUE'
-                else:
-                    print(f"Unknown type {row['Data type']} for keyword {key}")
-            except (TypeError, AttributeError, ValueError):
-                print(
-                    f"Cannot convert value {value} for keyword {key} to type {row['Data type']}"
-                )
+            phead[key] = parse_value_to_datatype(key, row["Data type"], value)
 
         self.set_header("PRIMARY", phead)
 
