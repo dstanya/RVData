@@ -1,3 +1,8 @@
+.. |eaccute| unicode:: U+00E9 :trim:
+.. |Eaccute| unicode:: U+00C9 :trim:
+		       
+
+
 Overview of the EPRV FITS Data Standard
 ***************************************
 
@@ -19,45 +24,50 @@ other quantities, are routinely produced by DRPs for use in scientific
 analyses. Sufficient data now exists for the same targets across
 multiple instruments to investigate effects from different hardware
 and software choices, which can impact how current instruments are
-used and also design choices for future instruments.
+used and also how future instruments are designed.
 
 These EPRV instruments generate data in native formats that were
-defined by individual instrument teams, rather than utilizing a common
-standard, which has introduced unecessary complication in processes
-such as building and maintaining data archives, carrying out
-scientific investigations that utilize data from multiple instruments,
-and making cross-comparisons of intrument internal performances. To
-address these issues, the **EPRV Data Standardization Project** has
-brought together an international collaboration of instrumentalists
-and software designers from existing and future echelle spectrographs,
-and defined a standard data format for multiple levels of processed
-echelle data. The project has also generated *translator* software to
-convert files currently in their native instrument team formats into
-the standard format.  This project was started in 2024, and expects to
-release the first versions for the *standard definition* and the
-*translator software* in the first half of 2026.
+defined by individual instrument teams at the time of construction,
+rather than utilizing a common standard, which has introduced
+unecessary complication in processes such as building and maintaining
+data archives, carrying out scientific investigations that utilize
+data from multiple instruments, and making cross-comparisons of
+intrument internal performances. To address these issues, the **EPRV
+Data Standardization Project** has brought together an international
+collaboration of instrumentalists and software developers from existing
+and future echelle spectrograph projects to *define a standard data format
+for multiple levels of processed echelle data*. The project has also
+generated *translator* software to convert files from their
+native instrument formats into the standard format.  This project
+was started in 2024, and expects to release the first versions for the
+*standard definition* and the *translator software* in the first half
+of 2026.
 
 New echelle spectrographs are encouraged to use the *standard* data
 format for their native data. Existing instrument teams who do not
 have a *translator* are encouraged to engage with the project to
 generate code for their instruments.
 
-The **EPRV Data Standardization Project** was funded by NASA EPRV
-Foundational Science Grant 22-EPRV22_2-0018.
+The **EPRV Data Standardization Project** was funded by `NASA EPRV
+Foundational Science Grant 22-EPRV22_2-0018
+<https://nspires.nasaprs.com/external/solicitations/summary.do?solId=%7bE52C5EC5-E0FC-403E-1071-4802DB562F0C%7d&path=&method=init>`.
 
 Data Standard Overview
 ======================
 
 The EPRV Data Standard stores data in FITS files and is compliant with
-FITS v4.0. The Standard defines data products at different *Levels* of
-processing, and places requirements on filenames, structure, and
-contents.
+`FITS v4.0 <https://fits.gsfc.nasa.gov/fits_standard.html>`. The
+standard defines data products at different *Levels* of processing,
+and places requirements on filenames, structure, and contents.
 
-#. All compliant files will be named using the following scheme: *inst_SL#_timestamp.fits.*
-   #. *inst* : Instrument name or abbreviation, in lower-case. (e.g., neid, kpf, expres). Different cameras are treated as separate instruments (e.g., for Maroon-X: mxred, mxblue)
-   #. *SL#* : Standard Level #, where # is typically 2, 3, 4, etc.
-   #. *timestamp* : Start of Exposure, corresponding to header DATE-OBS keyword. Limited to *YYYYMMDDTHHMMSS*. In cases where fractional seconds are required to distinguish files, add milliseconds as *sss*.
+#. All compliant files will be named using the following scheme: **<inst>_SL<#>_<timestamp>.fits**
+
+   #. **<inst>** : Instrument name or abbreviation, in lower-case. (e.g., neid, kpf, expres). Different cameras are treated as separate instruments (e.g., for Maroon-X: mxred, mxblue)
+   #. **<SL#>** : Standard Level #, where # is typically 2, 3, 4, etc.
+   #. **<timestamp>** : Start of Exposure, corresponding to header DATE-OBS keyword. Limited to *YYYYMMDDTHHMMSS*. In cases where fractional seconds are required to distinguish files, add milliseconds as *sss*.
+
 #. Standard data levels are defined as follows:
+
    #. Level 0 is not defined by the standard, but is
       envisioned to be the native raw data format returned by the
       instrument.
@@ -115,7 +125,7 @@ The **EPRV Data Standardization Project** team is listed below.  Core team membe
   * *Andreas Quirrenback, University of Heidelberg, Collaborator (CARMENES)*
   * Andrew Szentgyorgyi, Smithsonian Astrophysical Observatory, Collaborator (G-CLEF)
 
-  * *&#201;tienne Artigau, Universit&#233; de Montr&#233;al (Spirou, NIRPS)*
+  * * |Eaccute| tienne Artigau, Universit |eaccute| \ de Montr |eaccute| al (Spirou, NIRPS)*
   * Neil Cook, Universit&eacute; de Montr&eacute;al (Spirou, NIRPS)
   * *Tanya Das, University of Chicago (MAROON-X)*
   * Joris De Ridder, KU Leuven (MARVEL)
