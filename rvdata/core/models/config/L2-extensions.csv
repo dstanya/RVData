@@ -4,7 +4,7 @@ HDU,Name,DataType,MinBitDepth,Multiplicity,Required,Description,Comments
 2,RECEIPT,BinTableHDU,,False,True,Table of operations that have been performed on this file,Table has columns: time; code release; branch name; commit hash; function; args; status.
 3,DRP_CONFIG,BinTableHDU,,False,True,Pipeline details (settings etc) to go from native data to L2,Table has one column where each row captures a config entry
 4,EXT_DESCRIPT,BinTableHDU,,False,True,Table describing contents of each extension,Table has two columns and each one row contains the name of an extension in the HDU and then a string description of what is in that extension
-5,ORDER_TABLE,BinTableHDU,,True,True,Table capturing the wavelength extent of each order in Trace 1,"Required columns: physical echelle order, index echelle order, start wavelength, end wavelength."
+5,ORDER_TABLE,BinTableHDU,,False,True,Table capturing the wavelength extent of each order in Trace 1,"Required columns: physical echelle order, index echelle order, start wavelength, end wavelength."
 6,TRACE1_FLUX,ImageHDU,,True,True,Flux in trace 1,Shape is NxM where N is number of orders (NUMORDER keyword in PRIMARY header) and M is the number of pixels in the dispersion direction.
 7,TRACE1_WAVE,ImageHDU,64,True,True,Wavelength solution for trace 1,Shape matches TRACE1_FLUX. Wavelengths should be in vaccuum. Set any undefined wavelength values - e.g. orders that are not currently extracted - to be NaN.
 8,TRACE1_VAR,ImageHDU,,True,True,Variance for trace 1,Shape matches TRACE1_FLUX
