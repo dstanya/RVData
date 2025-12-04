@@ -44,20 +44,20 @@ def parse_value_to_datatype(keyword: str, datatype: str, in_value):
         if value is None:
             out_value = None
         elif isinstance(value, str) and value.lower() == "undefined":
-            out_value =  None
+            out_value = None
         elif datatype.lower() == "uint":
-            out_value =  int(value)
+            out_value = int(value)
         elif datatype.lower() == "float":
-            out_value =  float(value)
+            out_value = float(value)
         elif datatype.lower() == "string":
-            out_value =  str(value)
+            out_value = str(value)
         elif datatype.lower() == "double":
-            out_value =  np.float64(value)
+            out_value = np.float64(value)
         elif datatype.lower() == "boolean":
             if isinstance(value, bool):
-                out_value =  value
+                out_value = value
             elif isinstance(value, str):
-                out_value =  value[0].lower() == "t"
+                out_value = value[0].lower() == "t"
         else:
             warnings.warn(f"Unknown type {datatype} for keyword {keyword}")
     except (TypeError, AttributeError, ValueError):
