@@ -4,8 +4,8 @@ ORGANIZA,"Organization the data belongs to, for licensing purposes",N/A,String,"
 ORIGIN,Entity that created this file,N/A,String,"ESO or NOIRLab",,N,
 DATALVL,Data Product Base Level,N/A,String,"L2 or L3",UNKNOWN,Y,
 OBSERVER,Observer,N/A,String,"Bender",UNKNOWN,Y,
-PROGRAM,Observing program name,N/A,String,"Bender01",UNKNOWN,N*,"For data filtering and attribution; default to Unknown if it doesnt exist"
-PINAME,Program PI Name,N/A,String,"Bender",UNKNOWN,N*,"For data filtering and attribution; default to Unknown if it doesnt exist"
+PROGRAM,Observing program name,N/A,String,"Bender01",UNKNOWN,N*,"For data filtering and attribution; default to Unknown if it does not exist"
+PINAME,Program PI Name,N/A,String,"Bender",UNKNOWN,N*,"For data filtering and attribution; default to Unknown if it does not exist"
 OBSTYPE,Observation type,N/A,String,"Sci or Eng",UNKNOWN,Y,
 OBSMODE,Observing mode,N/A,String,"HR or HE",,N,
 READMODE,Readout Mode,N/A,String,"Fast; Slow; UTR; FowlerN; or CDS",,N,
@@ -20,7 +20,7 @@ DATE-OBS,Date/time at start of exposure,UTC,String,"2018-04-26T15:53:13.456",UNK
 JD_UTC,Julian date of DATE-OBS,day,Double,2450000,UNDEFINED,Y,
 EXPTIME,Exposure time,s,Float,29.43664,UNDEFINED,Y,
 TRACE1 ... TRACE#,Type of object in trace 1 to #,N/A,String,"SCI or CAL or SKY",UNKNOWN,Y,"Can be expanded to multiple keywords indexed 1 to #"
-CLSRC1 ... CLSRC#,Name of calibration source in trace 1 to # [if used],N/A,String,"LFC or Etalon or UrNe",UNKNOWN,Y,"Can be expanded to multiple keywords indexed 1 to #"
+CLSRC1 ... CLSRC#,Name of calibration source in trace 1 to # [if used],N/A,String,"LFC or Etalon or UNe",UNKNOWN,Y,"Can be expanded to multiple keywords indexed 1 to #"
 CSRC1 ... CSRC#,Catalog source for object in trace 1 to #,N/A,String,"GaiaDR2",UNKNOWN,Y,"Can be expanded to multiple keywords indexed 1 to #; Should define hierarchy of catalogs"
 CID1 ... CID#,Catalog name/designation for object in trace 1 to #,N/A,String,"DR2 NNNNNNNNNNNNNNNNNNN",UNKNOWN,Y,"Can be expanded to multiple keywords indexed 1 to #"
 CRA1 ... CRA#,Catalog right ascension for object in trace 1 to #,sexagesimal,String,"HH:MM:SS.sss",UNKNOWN,Y,"Can be expanded to multiple keywords indexed 1 to #"
@@ -29,8 +29,8 @@ CEQNX1 ... CEQNX#,Catalog equinox for object in trace 1 to #,yr,Float,2000,UNDEF
 CEPCH1 ... CEPCH#,Catalog epoch for object in trace 1 to #,yr,Float,2015.5,UNDEFINED,Y,"Can be expanded to multiple keywords indexed 1 to #"
 CRV1 ... CRV#,Catalog Systemic RV for for object in trace 1 to #,km/s,Float,45.654,UNDEFINED,Y,"Can be expanded to multiple keywords indexed 1 to #"
 CPLX1 ... CPLX#,Catalog parallax for object in trace 1 to #,mas,Float,20.45,,N,"Can be expanded to multiple keywords indexed 1 to #"
-CPMR1 ... CPMR#,Catalog proper motion RA for object in trace 1 to #,�/yr,Float,0.0345,,N,"Can be expanded to multiple keywords indexed 1 to #"
-CPMD1 ... CPMD#,Catalog proper motion DEC for object in trace 1 to #,�/yr,Float,0.345,,N,"Can be expanded to multiple keywords indexed 1 to #"
+CPMR1 ... CPMR#,Catalog proper motion RA for object in trace 1 to #,arcsec/yr,Float,0.0345,,N,"Can be expanded to multiple keywords indexed 1 to #"
+CPMD1 ... CPMD#,Catalog proper motion DEC for object in trace 1 to #,arcsec/yr,Float,0.345,,N,"Can be expanded to multiple keywords indexed 1 to #"
 CZ1 ... CZ#,Catalog Z for for object in trace 1 to #,N/A,Float,0.00000454,,N,"Can be expanded to multiple keywords indexed 1 to #"
 CCLRN1 ... CCLRN#,Catalog color 1 - color 2 name for object in trace 1 to #,N/A,String,"Gaia B-R",,N,"Can be expanded to multiple keywords indexed 1 to #"
 CCLR1 ... CCLR#,Catalog color 1 - color 2 for object in trace 1 to #,mag,Float,0.47,,N,"Can be expanded to multiple keywords indexed 1 to #"
@@ -66,12 +66,16 @@ MOONANG,Target-Moon Angle,deg,Float,34.56,,N,
 MOONEL,Moon Elevation Angle,deg,Float,26.8,,N,
 MOONILLU,Moon illumination,%,Float,23.4,,N,
 MOONRV,RV of reflected sunlight off moon,km/s,Float,1.3,,N,
+M1TMP,Primary mirror temperature,deg C,Float,10.0,,N,
+M1TMPT,M1TMP timestamp,UTC,String,"2024-02-20T03:31:33",,N,
 INHUM,relative humidity inside dome,%,Float,56.6,,N,
 INHUMT,INHUM timestamp,UTC,String,"2024-02-20T03:31:33",,N,
 OUTTMP,Outside temperature,deg C,Float,"0.0",,N,
 OUTTMPT,OUTTMP timestamp,UTC,String,"2024-02-20T03:31:33",,N,
 OUTHUM,Outside relative humidity,%,Float,56.6,,N,
 OUTHUMT,OUTHUM timestamp,UTC,String,"2024-02-20T03:31:33",,N,
+OUTPRES,Outdoor Atmospheric Pressure,kPa,Float,80.0,,N,
+OUTPREST,OUTPRES timestamp,UTC,String,"2024-02-20T03:31:33",,N,
 ENVWINDS,Wind speed,m/s,Float,23.4,,N,"Details are obs specific and not uniform; best effort as available from the observatory"
 ENVWINDD,Wind direction,angle,Float,133.5,,N,"Details on where wind is measured (position of weather station) should be captured in documentation"
 DRPTAG,RV DRP version,N/A,String,"v1.1.0",UNKNOWN,Y,
@@ -91,4 +95,4 @@ OBSFLAG,Observer pass/fail for exposure,N/A,String,"Pass or Fail",,N,
 SUMMFLAG,Summary roll up of other flag keywords,N/A,String,"Pass or Fail",UNKNOWN,Y,
 DQLVL0,Quality check bitfield of N characters,N/A,UInt,0,UNDEFINED,Y,"see e.g. https://neid.ipac.caltech.edu/docs/NEID-DRP/bitfields.html"
 DQLVL1,Quality check bitfield of N characters,N/A,UInt,0,UNDEFINED,Y,"see e.g. https://neid.ipac.caltech.edu/docs/NEID-DRP/bitfields.html"
-DQLVL2,Quality check bitfield of N characters,N/A,UInt,0,UNDEFINED,Y,"Standardize first few bits then leave remaining for instruent specific checks"
+DQLVL2,Quality check bitfield of N characters,N/A,UInt,0,UNDEFINED,Y,"Standardize first few bits then leave remaining for instrument specific checks"

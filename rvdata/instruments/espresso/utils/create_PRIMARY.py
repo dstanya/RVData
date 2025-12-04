@@ -574,7 +574,7 @@ def get_simbad_data(obj: str) -> dict:
         # Configure Simbad with custom settings
         custom_simbad = Simbad()
         custom_simbad.TIMEOUT = config.timeout  # Increase timeout if needed
-        custom_simbad.add_votable_fields("ids", "plx")
+        custom_simbad.add_votable_fields("ids", "plx_value")
 
         # Query Simbad for the object
         result = custom_simbad.query_object(obj)
