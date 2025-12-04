@@ -11,6 +11,7 @@ Documentation for EPRV Data Standardization Project!
    :caption: Contents:
 
    overview.rst
+   governance.rst
    interact.rst
    new.rst
    FITS-extensions.rst
