@@ -95,5 +95,4 @@ OBSFLAG,Observer pass/fail for exposure,N/A,String,"Pass or Fail",,N,
 SUMMFLAG,Summary roll up of other flag keywords,N/A,String,"Pass or Fail",UNKNOWN,Y,
 DQLVL0,Quality check bitfield of N characters,N/A,UInt,0,UNDEFINED,Y,"see e.g. https://neid.ipac.caltech.edu/docs/NEID-DRP/bitfields.html"
 DQLVL1,Quality check bitfield of N characters,N/A,UInt,0,UNDEFINED,Y,"see e.g. https://neid.ipac.caltech.edu/docs/NEID-DRP/bitfields.html"
-DQLVL2,Quality check bitfield of N characters,N/A,UInt,0,UNDEFINED,Y,"Standardize first few bits then leave remaining for instruent specific checks"
-
+DQLVL2,Quality check bitfield of N characters,N/A,UInt,0,UNDEFINED,Y,"Standardize first few bits then leave remaining for instrument specific checks"
