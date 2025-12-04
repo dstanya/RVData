@@ -12,8 +12,8 @@ import rvdata.core.models.base
 from rvdata.core.models.definitions import (
     LEVEL2_PRIMARY_KEYWORDS,
     LEVEL2_EXTENSIONS,
-    LEVEL2_DRP_CONFIG_COLUMNS,
-    LEVEL2_ORDER_TABLE_COLUMNS,
+    BASE_DRP_CONFIG_COLUMNS,
+    BASE_ORDER_TABLE_COLUMNS,
     BASE_RECEIPT_COLUMNS,
 )
 from rvdata.core.tools.headers import parse_value_to_datatype
@@ -30,9 +30,8 @@ class RV2(rvdata.core.models.base.RVDataModel):
         super().__init__()
         self.level = 2
 
-        for i, row in LEVEL2_EXTENSIONS.iterrows():
-            if row["Required"]:
-                # TODO: set description and comment
+        for _, row in LEVEL2_EXTENSIONS.iterrows():
+            if row["Required"] and row["Name"] not in self.extensions.keys():
                 self.create_extension(row["Name"], row["DataType"])
 
         # initialize PRIMARY header keywords to defaults with units and descriptions
@@ -68,11 +67,11 @@ class RV2(rvdata.core.models.base.RVDataModel):
         self.set_data("RECEIPT", pd.DataFrame(columns=receipt_columns))
 
         # Initialize DRP_CONFIG with columns from definition
-        drp_config_columns = LEVEL2_DRP_CONFIG_COLUMNS["Name"].tolist()
+        drp_config_columns = BASE_DRP_CONFIG_COLUMNS["Name"].tolist()
         self.set_data("DRP_CONFIG", pd.DataFrame(columns=drp_config_columns))
 
         # Initialize ORDER_TABLE with columns from definition
-        order_table_columns = LEVEL2_ORDER_TABLE_COLUMNS["Name"].tolist()
+        order_table_columns = BASE_ORDER_TABLE_COLUMNS["Name"].tolist()
         self.set_data("ORDER_TABLE", pd.DataFrame(columns=order_table_columns))
 
     def _read(self, hdul: fits.HDUList) -> None:
