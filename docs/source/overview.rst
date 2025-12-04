@@ -115,7 +115,7 @@ The **EPRV Data Standardization Project** team is listed below.  Core team membe
   * *Andreas Quirrenback, University of Heidelberg, Collaborator (CARMENES)*
   * Andrew Szentgyorgyi, Smithsonian Astrophysical Observatory, Collaborator (G-CLEF)
 
-  * *&Eacute;tienne Artigau, Universit&eacute; de Montr&eacute;al (Spirou, NIRPS)*
+  * *&#201;tienne Artigau, Universit&#233; de Montr&#233;al (Spirou, NIRPS)*
   * Neil Cook, Universit&eacute; de Montr&eacute;al (Spirou, NIRPS)
   * *Tanya Das, University of Chicago (MAROON-X)*
   * Joris De Ridder, KU Leuven (MARVEL)
