@@ -40,14 +40,14 @@ class RV3(rvdata.core.models.base.RVDataModel):
                 keyword = row["Keyword"].split()[0]
                 datatype = row["DataType"]
                 default = row["Default"]
+                description = row["Description"]
                 units = row["Units"]
                 if pd.isna(units) or units == "" or units.lower() == "N/A".lower():
                     unitstr = ""
                 else:
                     unitstr = f"[{units}] "
-                self.headers["PRIMARY"][keyword] = (
-                    parse_value_to_datatype(keyword, datatype, default),
-                    f"{unitstr}{row['Description']}",
+                self.headers["PRIMARY"][keyword] = parse_value_to_datatype(
+                    keyword, datatype, (default, f"{unitstr}{description}")
                 )
 
         # Add EXT_DESCRIPT as a DataFrame
