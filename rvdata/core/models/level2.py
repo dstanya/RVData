@@ -9,7 +9,7 @@ import numpy as np
 import pandas as pd
 
 import rvdata.core.models.base
-from rvdata.core.models.definitions import LEVEL2_EXTENSIONS
+from rvdata.core.models.definitions import LEVEL2_EXTENSIONS, LEVEL2_PRIMARY_KEYWORDS
 
 
 class RV2(rvdata.core.models.base.RVDataModel):
