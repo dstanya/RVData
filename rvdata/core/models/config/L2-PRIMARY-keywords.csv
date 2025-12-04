@@ -1,5 +1,5 @@
 ﻿Keyword,Description,Units,DataType,Example Value,Default,Required,Comments
-INSTRUME,Instrument name,N/A,String,"NEID or HARPS",UNKNOWN ,True,
+INSTRUME,Instrument name,N/A,String,"NEID or HARPS",UNKNOWN,True,
 ORGANIZA,"Organization the data belongs to, for licensing purposes",N/A,String,"ESO or CC-0",CC-0,False,
 ORIGIN,Entity that created this file,N/A,String,"ESO or NOIRLab",UNKNOWN,False,
 DATALVL,Data Product Base Level,N/A,String,"L2 or L3",UNKNOWN,True,

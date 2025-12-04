@@ -65,7 +65,9 @@ class RVDataModel(object):
         self.read_methods = INSTRUMENT_READERS
 
         self.extensions = OrderedDict()  # map name to FITS type
-        self.headers = OrderedDict()  # map name to extension header
+        self.headers = (
+            OrderedDict()
+        )  # map name to extension header; the dict is keyword to (value, comment)
         self.data = OrderedDict()  # map name to extension data
         self.receipt = pd.DataFrame([])
 
@@ -192,9 +194,7 @@ class RVDataModel(object):
             key = row["Keyword"]
             if key in self.headers["PRIMARY"]:
                 value = self.headers["PRIMARY"][key]
-                parsed_value = parse_value_to_datatype(
-                    key, row["DataType"], value
-                )
+                parsed_value = parse_value_to_datatype(key, row["DataType"], value)
                 self.headers["PRIMARY"][key] = parsed_value
 
         # compute MD5 sum of source file and write it into a receipt entry for tracking.

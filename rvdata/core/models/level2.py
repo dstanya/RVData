@@ -35,22 +35,29 @@ class RV2(rvdata.core.models.base.RVDataModel):
                 # TODO: set description and comment
                 self.create_extension(row["Name"], row["DataType"])
 
-        # initialize PRIMARY header keywords to defaults
+        # initialize PRIMARY header keywords to defaults with units and descriptions
         for _, row in LEVEL2_PRIMARY_KEYWORDS.iterrows():
             if row["Required"]:
                 keyword = row["Keyword"].split()[0]
                 datatype = row["DataType"]
                 default = row["Default"]
-                self.headers["PRIMARY"][keyword] = parse_value_to_datatype(
-                    keyword, datatype, default
+                units = row["Units"]
+                if pd.isna(units) or units == "" or units.lower() == "N/A".lower():
+                    unitstr = ""
+                else:
+                    unitstr = f"[{units}] "
+                self.headers["PRIMARY"][keyword] = (
+                    parse_value_to_datatype(keyword, datatype, default),
+                    f"{unitstr}{row['Description']}",
                 )
 
-        # Add EXT_DESCRIPT as a DataFrame, dropping the Comments column
+        # Add EXT_DESCRIPT as a DataFrame
+        # Only use the Name and Description columns
         ext_descript = (
-            LEVEL2_EXTENSIONS.copy().query("Required == True").reset_index(drop=True)
+            LEVEL2_EXTENSIONS.copy()
+            .query("Required == True")[["Name", "Description"]]
+            .reset_index(drop=True)
         )
-        if "Comments" in ext_descript.columns:
-            ext_descript = ext_descript.drop(columns=["Comments"])
         self.set_data("EXT_DESCRIPT", ext_descript)
 
         # Initialize INSTRUMENT_HEADER with a dummy zero image
@@ -143,7 +150,9 @@ class RV2(rvdata.core.models.base.RVDataModel):
         for key, value in hdu_definitions:
             hduname = key
             if value == "PrimaryHDU":
-                head = fits.Header(self.headers[key])
+                head = fits.Header()
+                for keyword, (val, comment) in self.headers[key].items():
+                    head[keyword] = (val, comment)
                 hdu = fits.PrimaryHDU(header=head)
                 hdu_list.insert(0, hdu)
             elif value == "ImageHDU":
