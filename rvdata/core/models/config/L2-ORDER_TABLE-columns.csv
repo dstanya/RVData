@@ -1,0 +1,5 @@
+Name,Description
+echelle_order,physical echelle order
+order_index,echelle order index
+wave_start,start wavelength
+wave_end,end wavelength

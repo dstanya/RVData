@@ -22,8 +22,8 @@ from rvdata.core.models.definitions import (
     LEVEL2_PRIMARY_KEYWORDS,
     LEVEL3_PRIMARY_KEYWORDS,
     LEVEL4_PRIMARY_KEYWORDS,
+    BASE_RECEIPT_COLUMNS,
 )
-from rvdata.core.models.receipt_columns import RECEIPT_COL
 from rvdata.core.tools.git import get_git_branch, get_git_revision_hash, get_git_tag
 from rvdata.core.tools.headers import parse_value_to_datatype
 
@@ -133,12 +133,12 @@ class RVDataModel(object):
                         t = Table.read(hdu)
                         # Table contains the RECEIPT
                         df: pd.DataFrame = t.to_pandas()
-                        # TODO: get receipt columns from core.models.config.BASE-RECEIPT-columns.csv
+                        receipt_columns = BASE_RECEIPT_COLUMNS["Name"].tolist()
                         if df.empty:
-                            df = pd.DataFrame(columns=RECEIPT_COL)
+                            df = pd.DataFrame(columns=receipt_columns)
                         else:
                             df = df.reindex(
-                                df.columns.union(RECEIPT_COL, sort=False),
+                                df.columns.union(receipt_columns, sort=False),
                                 axis=1,
                                 fill_value="",
                             )
@@ -193,7 +193,7 @@ class RVDataModel(object):
             if key in self.headers["PRIMARY"]:
                 value = self.headers["PRIMARY"][key]
                 parsed_value = parse_value_to_datatype(
-                    key, row["Data type"], value
+                    key, row["DataType"], value
                 )
                 self.headers["PRIMARY"][key] = parsed_value
 
@@ -230,8 +230,9 @@ class RVDataModel(object):
             hdu_list = gen_hdul()
         # finish up writing
         hdul = fits.HDUList(hdu_list)
-        if not os.path.isdir(os.path.dirname(fn)):
-            os.makedirs(os.path.dirname(fn), exist_ok=True)
+        dirname = os.path.dirname(fn)
+        if dirname != "" and not os.path.isdir(dirname):
+            os.makedirs(dirname, exist_ok=True)
         hdul.writeto(fn, overwrite=True, output_verify="silentfix")
         hdul.close()
 

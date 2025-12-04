@@ -44,11 +44,8 @@ def check_l2_header(header):
     )
     reference_header = pd.read_csv(ref_csv)
     for i, row in reference_header.iterrows():
-        key = row["Keyword"]
-        req = row["Required"] == "Y"
-        if "#" in key or "..." in key:
-            # print(f"Stripping multi keyword: {key}")
-            key = key.split("...")[0].strip()
+        key = row["Keyword"].split()[0]
+        req = row["Required"]
         if req and (key not in header):
             print(key, req)
             assert key in header, f"Keyword {key} not found in header"

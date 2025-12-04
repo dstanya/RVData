@@ -1,4 +1,4 @@
-Keyword,Description,Units,Data type,Example Value,FITS required,Default,Inherited? [Y/N/M],Required,Notes
+Keyword,Description,Units,DataType,Example Value,FITS required,Default,Inherited? [Y/N/M],Required,Notes
 BJDTDB,Barycentric Julian Day in Terrestrial Dynamical time,JD,double,2456000.0034665440,,,,Y,
 RV,RV value recommended by team,km/s,float,,,,,Y,
 RVERR,Error on RV ,km/s,float,,,,,Y,

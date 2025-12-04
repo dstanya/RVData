@@ -9,7 +9,14 @@ import numpy as np
 import pandas as pd
 
 import rvdata.core.models.base
-from rvdata.core.models.definitions import LEVEL2_EXTENSIONS
+from rvdata.core.models.definitions import (
+    LEVEL2_PRIMARY_KEYWORDS,
+    LEVEL2_EXTENSIONS,
+    LEVEL2_DRP_CONFIG_COLUMNS,
+    LEVEL2_ORDER_TABLE_COLUMNS,
+    BASE_RECEIPT_COLUMNS,
+)
+from rvdata.core.tools.headers import parse_value_to_datatype
 
 
 class RV2(rvdata.core.models.base.RVDataModel):
@@ -23,19 +30,43 @@ class RV2(rvdata.core.models.base.RVDataModel):
         super().__init__()
         self.level = 2
 
-        # TODO: initialize header keywords for each extension
-
         for i, row in LEVEL2_EXTENSIONS.iterrows():
             if row["Required"]:
                 # TODO: set description and comment
                 self.create_extension(row["Name"], row["DataType"])
 
+        # initialize PRIMARY header keywords to defaults
+        for _, row in LEVEL2_PRIMARY_KEYWORDS.iterrows():
+            if row["Required"]:
+                keyword = row["Keyword"].split()[0]
+                datatype = row["DataType"]
+                default = row["Default"]
+                self.headers["PRIMARY"][keyword] = parse_value_to_datatype(
+                    keyword, datatype, default
+                )
+
         # Add EXT_DESCRIPT as a DataFrame, dropping the Comments column
-        ext_descript = LEVEL2_EXTENSIONS.copy().query('Required == True')\
-            .reset_index(drop=True)
+        ext_descript = (
+            LEVEL2_EXTENSIONS.copy().query("Required == True").reset_index(drop=True)
+        )
         if "Comments" in ext_descript.columns:
             ext_descript = ext_descript.drop(columns=["Comments"])
         self.set_data("EXT_DESCRIPT", ext_descript)
+
+        # Initialize INSTRUMENT_HEADER with a dummy zero image
+        self.set_data("INSTRUMENT_HEADER", np.zeros((1,), dtype=np.float32))
+
+        # Initialize RECEIPT with receipt columns
+        receipt_columns = BASE_RECEIPT_COLUMNS["Name"].tolist()
+        self.set_data("RECEIPT", pd.DataFrame(columns=receipt_columns))
+
+        # Initialize DRP_CONFIG with columns from definition
+        drp_config_columns = LEVEL2_DRP_CONFIG_COLUMNS["Name"].tolist()
+        self.set_data("DRP_CONFIG", pd.DataFrame(columns=drp_config_columns))
+
+        # Initialize ORDER_TABLE with columns from definition
+        order_table_columns = LEVEL2_ORDER_TABLE_COLUMNS["Name"].tolist()
+        self.set_data("ORDER_TABLE", pd.DataFrame(columns=order_table_columns))
 
     def _read(self, hdul: fits.HDUList) -> None:
         l2_ext = LEVEL2_EXTENSIONS.set_index("Name")
@@ -45,9 +76,9 @@ class RV2(rvdata.core.models.base.RVDataModel):
                 t1 = "TRACE1_" + hdu.name.split("_")[1]
                 fits_type = l2_ext.loc[t1]["DataType"]
             elif "IMAGE" in hdu.name:
-                fits_type = l2_ext.loc['IMAGE']['DataType']
-            elif 'DRIFT' in hdu.name:
-                fits_type = l2_ext.loc['DRIFT']['DataType']
+                fits_type = l2_ext.loc["IMAGE"]["DataType"]
+            elif "DRIFT" in hdu.name:
+                fits_type = l2_ext.loc["DRIFT"]["DataType"]
             else:
                 fits_type = l2_ext.loc[hdu.name]["DataType"]
             if hdu.name not in self.extensions.keys():
@@ -95,12 +126,10 @@ class RV2(rvdata.core.models.base.RVDataModel):
 
             ext = self.data[name]
             if isinstance(ext, np.ndarray):
-                row = "|{:20s} |{:20s} |{:20s}\n"\
-                    .format(name, "array", str(ext.shape))
+                row = "|{:20s} |{:20s} |{:20s}\n".format(name, "array", str(ext.shape))
                 head += row
             elif isinstance(ext, pd.DataFrame):
-                row = "|{:20s} |{:20s} |{:20s}\n"\
-                    .format(name, "table", str(len(ext)))
+                row = "|{:20s} |{:20s} |{:20s}\n".format(name, "table", str(len(ext)))
                 head += row
         print(head)
 
