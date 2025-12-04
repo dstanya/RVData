@@ -1,5 +1,5 @@
 HDU,Name,DataType,Multiplicity,Required,Description,Comments
-0,PRIMARY,PrimaryHDU,False,True,EPRV Standard FITS HEADER (no data),Carried forward from L2 FITS file. Append BJD_TDB; RV; RVERROR; BERV; RVMETHOD; and SYSVEL header keywords.
+0,PRIMARY,PrimaryHDU,False,True,EPRV Standard FITS HEADER (no data),Carried forward from L2 FITS file. Append BJDTDB; RV; RVERR; BERV; RVMETHOD; and SYSVEL header keywords.
 1,INSTRUMENT_HEADER,ImageHDU,False,True,Inherited instrument header (no data),Carried forward from L2 FITS file.  
 2,RECEIPT,BinTableHDU,False,True,Table of operations that have been performed on this file,Table has columns: time; code release; branch name; commit hash; function; args; status.
 3,DRP_CONFIG,BinTableHDU,False,True,Pipeline details (settings etc) to go from native data to L2,Table has one column where each row captures a config entry.
