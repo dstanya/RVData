@@ -107,7 +107,9 @@ class KPFRV2(RV2):
                     blaze_data = hdul1[blaze_ext].data
                     blaze_meta = OrderedDict(hdul1[blaze_ext].header)
                 else:
-                    warnings.warn("Blaze extensions not found in KPF L1 file, using default.")
+                    warnings.warn(
+                        "Blaze extensions not found in KPF L1 file, using default."
+                    )
                     blaze_data = blazeHDU[flux_ext].data
                     blaze_meta = OrderedDict(blazeHDU[flux_ext].header)
 
@@ -267,6 +269,7 @@ class KPFRV2(RV2):
             else:
                 phead[skey] = None
 
+        phead["ISSOLAR"] = ihead["OBJECT"].lower() == "socal"
         self.set_header("PRIMARY", phead)
 
         # overwrite EXT_DESCRIPT as a DataFrame, dropping the Comments column

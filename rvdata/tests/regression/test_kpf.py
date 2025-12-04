@@ -10,9 +10,9 @@ from rvdata.tests.regression.compliance import check_l4_extensions, check_l4_hea
 
 file_urls = {
     "KPF": [
-        "https://zenodo.org/records/15047493/files/KP.20250208.17485.59.fits?download=1",
-        "https://zenodo.org/records/15047493/files/KP.20250208.17485.59_L1.fits?download=1",
-        "https://zenodo.org/records/15047493/files/KP.20241022.41656.30_L2.fits?download=1",
+        "http://grinnell.as.arizona.edu/~rvdata/kpf/KP.20250208.17485.59.fits",
+        "http://grinnell.as.arizona.edu/~rvdata/kpf/KP.20250208.17485.59_L1.fits",
+        "http://grinnell.as.arizona.edu/~rvdata/kpf/KP.20241022.41656.30_L2.fits",
     ]
 }
 
@@ -59,7 +59,7 @@ def test_kpf():
 
 def test_kpf_benchmark(benchmark):
     # run test_kpf() once to download the files
-    _ = download_files
+    _ = download_files()
     # now run it again with benchmark
     benchmark(test_kpf)
 

@@ -26,7 +26,12 @@ from astropy.coordinates import (
     EarthLocation,
     AltAz,
     get_body,
+    get_sun,
+    Angle,
     get_body_barycentric_posvel,
+    solar_system_ephemeris,
+    ICRS,
+    GCRS
 )
 from astropy import units as u
 from astroquery.simbad import Simbad
@@ -41,7 +46,7 @@ import rvdata.instruments.espresso.config.config as config
 from rvdata.core.models.level2 import RV2
 
 
-def create_PRIMARY(RV2: RV2, names: list[str], nb_trace: int, nb_slice: int) -> None:
+def create_PRIMARY(RV2: RV2, names: list[str], nb_trace: int, nb_slice: int, level: int = 2) -> None:
     """
     Create the PRIMARY HDU for the L2 FITS file by copying relevant metadata
     from different files and applying necessary transformations.
@@ -68,7 +73,6 @@ def create_PRIMARY(RV2: RV2, names: list[str], nb_trace: int, nb_slice: int) -> 
     - If a keyword value is missing in the source file, it is set to `Null`.
     - Special handling is applied for some keyword.
     """
-
     # We create an empty HDU to store the L2 Primary header
     l2_hdu = fits.PrimaryHDU(data=None)
     l2_hdu.header["EXTNAME"] = "PRIMARY"
@@ -83,23 +87,34 @@ def create_PRIMARY(RV2: RV2, names: list[str], nb_trace: int, nb_slice: int) -> 
     header_map = pd.read_csv(header_map_path)
 
     # We replace the %UT% in the header map with the front end ID to get the
-    # correct keywords depending on which UT was used
-    if "HIERARCH ESO OCS ENABLED FE" in RV2.headers["INSTRUMENT_HEADER"]:
-        front_end_id = RV2.headers["INSTRUMENT_HEADER"]["HIERARCH ESO OCS ENABLED FE"][
-            0
-        ]
-    elif "TELESCOP" in RV2.headers["INSTRUMENT_HEADER"]:
-        front_end_id = RV2.headers["INSTRUMENT_HEADER"]["TELESCOP"][-1]
 
-    header_map["ESO_keyword"] = header_map["ESO_keyword"].str.replace(
-        "%UT%", front_end_id
-    )
-    # TODO
-    # #Special case for UT1
-    # if RV2.UT == '1':
-    #     header_map['ESO_keyword'] = header_map['ESO_keyword']
-    #       .str.replace('INS1', 'INS')
+    # These keywords change based on which UT is active
+    multi_UTs_keywords = [
+        # 'HIERARCH ESO TEL%UT% GEOLON',
+        # 'HIERARCH ESO TEL%UT% GEOLAT',
+        'HIERARCH ESO TEL%UT% AMBI FWHM START',
+        'HIERARCH ESO TEL%UT% ALT',
+        'HIERARCH ESO TEL%UT% PARANG START',
+        'HIERARCH ESO TEL%UT% PARANG END',
+        'HIERARCH ESO ADA%UT% ABSROT END'
+    ]
+    active_UTs = [str(c) for c in [
+        1, 2, 3, 4] if RV2.headers['INSTRUMENT_HEADER'][f'HIERARCH ESO OCS TEL{c} ST']]
+    for i in range(len(active_UTs)):
+        l2_hdu.header[f'TELEID{str(i+1)}'] = (f'ESO-VLT-U{active_UTs[i]}',
+                                              'Labels for telescopes as indexed in TCS keywords')
+    l2_hdu.header['NUMTEL'] = (
+        len(active_UTs), 'Number of telescopes used in the observation')
 
+    if (len(active_UTs) == 1):
+        header_map["ESO_keyword"] = header_map["ESO_keyword"].str.replace(
+            "%UT%", active_UTs[0]
+        )
+    else:
+        # We assign one UT value to the keywords that remain the same even when multiple UTs
+        # are active
+        header_map['ESO_keyword'] = [c.replace("%UT%", active_UTs[0]) if
+                                     ("%UT%" in str(c) and c not in multi_UTs_keywords) else c for c in header_map['ESO_keyword']]
     # We iterate through the header_map file to translate each keyword.
     for index, values in header_map.iterrows():
         # If the keyword has its skip value set to True, it is not copied
@@ -124,12 +139,28 @@ def create_PRIMARY(RV2: RV2, names: list[str], nb_trace: int, nb_slice: int) -> 
             # Otherwise, we copy the value from the good file
             elif pd.notna(header_map["ESO_keyword"].iloc[index]):
                 if header_map["from"].iloc[index] == "S2D_BLAZE_A":
-                    l2_hdu.header[values.iloc[0]] = (
-                        RV2.headers["INSTRUMENT_HEADER"][
-                            header_map["ESO_keyword"].iloc[index]
-                        ],
-                        header_map["Description"].iloc[index],
-                    )
+                    if (len(active_UTs) > 1 and header_map["ESO_keyword"].iloc[index] in multi_UTs_keywords):
+                        for ut in active_UTs:
+                            l2_key = values.iloc[0]
+                            if (l2_key[-1] == '1'):
+                                l2_key = l2_key[:-1] + ut
+                            else:
+                                l2_key = l2_key + ut
+                            l2_hdu.header[l2_key] = (
+                                RV2.headers["INSTRUMENT_HEADER"][
+                                    header_map["ESO_keyword"].iloc[index].replace(
+                                        "%UT%", ut)
+                                ],
+                                header_map["Description"].iloc[index] +
+                                ' for UT'+ut,
+                            )
+                    else:
+                        l2_hdu.header[values.iloc[0]] = (
+                            RV2.headers["INSTRUMENT_HEADER"][
+                                header_map["ESO_keyword"].iloc[index]
+                            ],
+                            header_map["Description"].iloc[index],
+                        )
                 elif header_map["from"].iloc[index] == "RAW":
                     with fits.open(names["raw_file"]) as hdu_raw:
                         l2_hdu.header[values.iloc[0]] = (
@@ -140,7 +171,8 @@ def create_PRIMARY(RV2: RV2, names: list[str], nb_trace: int, nb_slice: int) -> 
                         )
                 elif header_map["from"].iloc[index] == "CONFIG":
                     l2_hdu.header[values.iloc[0]] = (
-                        getattr(config, header_map["ESO_keyword"].iloc[index], None),
+                        getattr(
+                            config, header_map["ESO_keyword"].iloc[index], None),
                         header_map["Description"].iloc[index],
                     )
 
@@ -169,27 +201,30 @@ def create_PRIMARY(RV2: RV2, names: list[str], nb_trace: int, nb_slice: int) -> 
     # FILENAME KEYWORD
     if os.name == "nt":
         l2_hdu.header["FILENAME"] = (
-            "inst"
+            "ESPR_"
             + config.data_format
             + "_"
             + RV2.filename.split(".")[1].replace("-", "").replace("_", "")
             + ".fits",
-            header_map[header_map["Keyword"] == "FILENAME"]["Description"].iloc[0],
+            header_map[header_map["Keyword"] ==
+                       "FILENAME"]["Description"].iloc[0],
         )
     else:
         l2_hdu.header["FILENAME"] = (
-            "inst"
+            "ESPR_"
             + config.data_format
             + "_"
             + RV2.filename.split(".")[1].replace("-", "").replace(":", "")
             + ".fits",
-            header_map[header_map["Keyword"] == "FILENAME"]["Description"].iloc[0],
+            header_map[header_map["Keyword"] ==
+                       "FILENAME"]["Description"].iloc[0],
         )
 
     # Getting SIMBAD/GAIA Catalog datas
     catalog_data = get_simbad_data(
         RV2.headers["INSTRUMENT_HEADER"][
-            header_map[header_map["Keyword"] == "OBJECT"]["ESO_keyword"].iloc[0]
+            header_map[header_map["Keyword"] ==
+                       "OBJECT"]["ESO_keyword"].iloc[0]
         ]
     )
 
@@ -228,37 +263,47 @@ def create_PRIMARY(RV2: RV2, names: list[str], nb_trace: int, nb_slice: int) -> 
         "CZ",
         "CCLR",
     ]
-
+    # Setting datalvl keyword
+    l2_hdu.header['ISSOLAR'] = (
+        bool(False), 'Is this an observation of the sun?')
+    l2_hdu.header['DATALVL'] = (
+        f'L{level}', header_map[header_map["Keyword"] == "DATALVL"]["Description"].iloc[0])
     with fits.open(names["raw_file"]) as hdu_raw:
-        dpr_type = hdu_raw["PRIMARY"].header["HIERARCH ESO DPR TYPE"].split(",")
+        dpr_type = hdu_raw["PRIMARY"].header["HIERARCH ESO DPR TYPE"].split(
+            ",")
         for i in range(1, nb_trace + 1):
             if dpr_type[math.ceil(i / nb_slice) - 1] == "OBJECT":
                 l2_hdu.header["TRACE" + str(i)] = (
                     "SCI",
-                    header_map[header_map["Keyword"] == "TRACE"]["Description"].iloc[0],
+                    header_map[header_map["Keyword"] ==
+                               "TRACE"]["Description"].iloc[0],
                 )
             elif dpr_type[math.ceil(i / nb_slice) - 1] == "FP":
                 l2_hdu.header["TRACE" + str(i)] = (
                     "CAL",
-                    header_map[header_map["Keyword"] == "TRACE"]["Description"].iloc[0],
+                    header_map[header_map["Keyword"] ==
+                               "TRACE"]["Description"].iloc[0],
                 )
             elif dpr_type[math.ceil(i / nb_slice) - 1] == "SKY":
                 l2_hdu.header["TRACE" + str(i)] = (
                     dpr_type[math.ceil(i / nb_slice) - 1],
-                    header_map[header_map["Keyword"] == "TRACE"]["Description"].iloc[0],
+                    header_map[header_map["Keyword"] ==
+                               "TRACE"]["Description"].iloc[0],
                 )
             else:
                 l2_hdu.header["TRACE" + str(i)] = (
                     header_map[header_map["Keyword"] == "TRACE"]["default_value"].iloc[
                         0
                     ],
-                    header_map[header_map["Keyword"] == "TRACE"]["Description"].iloc[0],
+                    header_map[header_map["Keyword"] ==
+                               "TRACE"]["Description"].iloc[0],
                 )
 
             # CALIBRATION SOURCE KEYWORD
             if l2_hdu.header["TRACE" + str(i)] == "CAL":
                 clsrc_value = RV2.headers["INSTRUMENT_HEADER"][
-                    header_map[header_map["Keyword"] == "CLSRC"]["ESO_keyword"].iloc[0]
+                    header_map[header_map["Keyword"] ==
+                               "CLSRC"]["ESO_keyword"].iloc[0]
                 ]
                 if clsrc_value == "HEADER":
                     l2_hdu.header["CLSRC" + str(i)] = (
@@ -285,7 +330,8 @@ def create_PRIMARY(RV2: RV2, names: list[str], nb_trace: int, nb_slice: int) -> 
                     header_map[header_map["Keyword"] == "CLSRC"]["default_value"].iloc[
                         0
                     ],
-                    header_map[header_map["Keyword"] == "CLSRC"]["Description"].iloc[0],
+                    header_map[header_map["Keyword"] ==
+                               "CLSRC"]["Description"].iloc[0],
                 )
 
             # CATALOG KEYWORDS
@@ -336,45 +382,62 @@ def create_PRIMARY(RV2: RV2, names: list[str], nb_trace: int, nb_slice: int) -> 
     )
 
     # TLST KEYWORD
-    l2_hdu.header["TLST"] = (
+    l2_hdu.header["TLST1"] = (
         convert_lst(RV2.headers["INSTRUMENT_HEADER"]["LST"]),
-        header_map[header_map["Keyword"] == "TLST"]["Description"].iloc[0],
+        header_map[header_map["Keyword"] == "TLST1"]["Description"].iloc[0],
     )
 
     # TRA KEYWORD
-    l2_hdu.header["TRA"] = (
+    l2_hdu.header["TRA1"] = (
         deg_to_sexagesimal(RV2.headers["INSTRUMENT_HEADER"]["RA"], True),
-        header_map[header_map["Keyword"] == "TRA"]["Description"].iloc[0],
+        header_map[header_map["Keyword"] == "TRA1"]["Description"].iloc[0],
     )
 
     # TDEC KEYWORD
-    l2_hdu.header["TDEC"] = (
+    l2_hdu.header["TDEC1"] = (
         deg_to_sexagesimal(RV2.headers["INSTRUMENT_HEADER"]["DEC"], False),
-        header_map[header_map["Keyword"] == "TDEC"]["Description"].iloc[0],
+        header_map[header_map["Keyword"] == "TDEC1"]["Description"].iloc[0],
     )
 
     # TZA KEYWORD
-    l2_hdu.header["TZA"] = (
-        np.round(90 - l2_hdu.header["TEL"], 3),
-        header_map[header_map["Keyword"] == "TZA"]["Description"].iloc[0],
-    )
+    if (len(active_UTs) == 1):
+        l2_hdu.header["TZA1"] = (
+            np.round(90 - l2_hdu.header["TEL1"], 3),
+            header_map[header_map["Keyword"] == "TZA1"]["Description"].iloc[0],
+        )
+    else:
+        for ut in active_UTs:
+            l2_hdu.header[f'TZA{ut}'] = (
+                np.round(90 - l2_hdu.header[f'TEL{ut}'], 3),
+                header_map[header_map["Keyword"] ==
+                           "TZA1"]["Description"].iloc[0],
+            )
 
     # THA KEYWORD
     l2_hdu.header["THA"] = (
-        compute_hour_angle(l2_hdu.header["TLST"], l2_hdu.header["TRA"]),
-        header_map[header_map["Keyword"] == "THA"]["Description"].iloc[0],
+        compute_hour_angle(l2_hdu.header["TLST1"], l2_hdu.header["TRA1"]),
+        header_map[header_map["Keyword"] == "THA1"]["Description"].iloc[0],
     )
 
     # MOONANG/MOONEL/MOONILLU/MOONRV/SUNEL KEYWORDS
-    moon_sun_params = get_moon_sun_info(
-        RV2.headers["INSTRUMENT_HEADER"]["RA"],
-        RV2.headers["INSTRUMENT_HEADER"]["DEC"],
-        l2_hdu.header["OBSLAT"],
-        l2_hdu.header["OBSLON"],
-        l2_hdu.header["OBSALT"],
-        l2_hdu.header["DATE-OBS"],
-        l2_hdu.header["JD_UTC"],
-    )
+    if (len(active_UTs) == 1):
+        moon_sun_params = get_moon_sun_info(
+            RV2.headers["INSTRUMENT_HEADER"]["RA"],
+            RV2.headers["INSTRUMENT_HEADER"]["DEC"],
+            l2_hdu.header["OBSLAT"],
+            l2_hdu.header["OBSLON"],
+            l2_hdu.header["OBSALT"],
+            l2_hdu.header["JD_UTC"],
+        )
+    else:
+        moon_sun_params = get_moon_sun_info(
+            RV2.headers["INSTRUMENT_HEADER"]["RA"],
+            RV2.headers["INSTRUMENT_HEADER"]["DEC"],
+            l2_hdu.header["OBSLAT"],
+            l2_hdu.header["OBSLON"],
+            l2_hdu.header["OBSALT"],
+            l2_hdu.header["JD_UTC"],
+        )
 
     # List of corresponding keywords
     moon_sun_keywords = ["SUNEL", "MOONANG", "MOONEL", "MOONILLU", "MOONRV"]
@@ -395,20 +458,31 @@ def create_PRIMARY(RV2: RV2, names: list[str], nb_trace: int, nb_slice: int) -> 
     # EXSNR-N KEYWORD
     for i in range(1, int(l2_hdu.header["NUMORDER"]) + 1):
         l2_hdu.header[f"EXSNR{str(i)}"] = (
-            RV2.headers["INSTRUMENT_HEADER"][f"HIERARCH ESO QC ORDER{str(i*2-1)} SNR"],
-            header_map[header_map["Keyword"] == "EXSNR"]["Description"].iloc[0],
+            RV2.headers["INSTRUMENT_HEADER"][
+                f"HIERARCH ESO QC ORDER{str(i*nb_slice-nb_slice//2)} SNR"],
+            header_map[header_map["Keyword"] ==
+                       "EXSNR"]["Description"].iloc[0],
         )
 
     # EXSNRW-N KEYWORD
+    table_order = pd.read_csv(os.path.join(
+        base_dir, "config", "table_order.csv"))
     for i in range(int(l2_hdu.header["NUMORDER"])):
+        # Previous version, now using the table_order table
+        # l2_hdu.header[f"EXSNRW{str(i+1)}"] = (
+        #     round(
+        #         RV2.data["TRACE1_WAVE"][i, 0]
+        #         + (RV2.data["TRACE1_WAVE"][i, -1] - RV2.data["TRACE1_WAVE"][i, 0]) / 2
+        #     ),
+        #     header_map[header_map["Keyword"] == "EXSNRW"]["Description"].iloc[0],
+        # )
+        # We take each value twice to account for the slices
         l2_hdu.header[f"EXSNRW{str(i+1)}"] = (
-            round(
-                RV2.data["TRACE1_WAVE"][i, 0]
-                + (RV2.data["TRACE1_WAVE"][i, -1] - RV2.data["TRACE1_WAVE"][i, 0]) / 2
-            ),
-            header_map[header_map["Keyword"] == "EXSNRW"]["Description"].iloc[0],
+            table_order.iloc[math.floor(
+                i/2)]["Central_wav[nm]"].astype('float')*10,
+            header_map[header_map["Keyword"] ==
+                       "EXSNRW"]["Description"].iloc[0],
         )
-
     # DRPFLAG KEYWORD
     drp_flag = RV2.headers["INSTRUMENT_HEADER"][
         header_map[header_map["Keyword"] == "DRPFLAG"]["ESO_keyword"].iloc[0]
@@ -426,7 +500,8 @@ def create_PRIMARY(RV2: RV2, names: list[str], nb_trace: int, nb_slice: int) -> 
     # COLOFLAG KEYWORD
     try:
         color_flag = RV2.headers["INSTRUMENT_HEADER"][
-            header_map[header_map["Keyword"] == "COLOFLAG"]["ESO_keyword"].iloc[0]
+            header_map[header_map["Keyword"] ==
+                       "COLOFLAG"]["ESO_keyword"].iloc[0]
         ]
         if color_flag == 1:
             coloflag = "Pass"
@@ -499,7 +574,7 @@ def get_simbad_data(obj: str) -> dict:
         # Configure Simbad with custom settings
         custom_simbad = Simbad()
         custom_simbad.TIMEOUT = config.timeout  # Increase timeout if needed
-        custom_simbad.add_votable_fields("ids", "plx")
+        custom_simbad.add_votable_fields("ids", "plx_value")
 
         # Query Simbad for the object
         result = custom_simbad.query_object(obj)
@@ -694,7 +769,8 @@ def get_instrument_version(date_obs_str: str) -> str:
             return version_info["version"]
 
     # If no version matches, raise an exception
-    raise ValueError(f"No instrument version corresponds to the date {date_obs_str}")
+    raise ValueError(
+        f"No instrument version corresponds to the date {date_obs_str}")
 
 
 def get_moon_sun_info(
@@ -703,7 +779,6 @@ def get_moon_sun_info(
     obs_lat: float,
     obs_lon: float,
     obs_alt: float,
-    obs_time: str,
     jd_utc: float,
 ) -> list:
     """
@@ -718,8 +793,6 @@ def get_moon_sun_info(
         obs_lat (float): Latitude of the observation location in degrees.
         obs_lon (float): Longitude of the observation location in degrees.
         obs_alt (float): Altitude of the observation location in meters.
-        obs_time (str): Observation time in ISO format
-            (e.g., 'YYYY-MM-DD HH:MM:SS').
         jd_utc (float): Julian Date (UTC) for the observation.
 
     Returns:
@@ -735,86 +808,50 @@ def get_moon_sun_info(
                 moon (in km/s).
     """
 
-    # Observer's location and observation time
-    location = EarthLocation(lat=obs_lat, lon=obs_lon, height=obs_alt)
-    time = Time(obs_time)
+    t_obs = Time(jd_utc, format='jd', scale='utc')
+    loc = EarthLocation(lat=obs_lat, lon=obs_lon, height=obs_alt)
+    coords = SkyCoord(target_ra, target_dec, frame='icrs', unit='deg')
+    star_icrs = SkyCoord(coords, frame=ICRS, unit=(u.hourangle, u.deg))
 
-    # Get the Moon's position at the given time and location (GCRS)
-    moon_coord = get_body("moon", time, location=location)
+    with solar_system_ephemeris.set('jpl'):
+        gcrs_frame = GCRS(obstime=t_obs, obsgeoloc=loc.get_gcrs_posvel(
+            t_obs)[0], obsgeovel=loc.get_gcrs_posvel(t_obs)[1])
+        star_coord_gcrs = star_icrs.transform_to(gcrs_frame)
+        sun_coord_gcrs = get_sun(t_obs).transform_to(gcrs_frame)
+        moon_coord_gcrs = get_body("moon", t_obs, loc).transform_to(gcrs_frame)
 
-    # We need to convert moon_coord in ICRS to match target_coord ref
-    moon_coord_icrs = moon_coord.transform_to("icrs")
+        moon_altaz = moon_coord_gcrs.transform_to(
+            AltAz(obstime=t_obs, location=loc))
+        moon_el = round(moon_altaz.alt.deg, 4)
+        sun_altaz = sun_coord_gcrs.transform_to(
+            AltAz(obstime=t_obs, location=loc))
+        sun_el = sun_altaz.alt.deg
 
-    # Target's position
-    target_coord = SkyCoord(
-        ra=target_ra, dec=target_dec, frame="icrs", unit="deg", obstime=time
-    )
+        elongation = sun_coord_gcrs.separation(moon_coord_gcrs)
+        moon_phase_angle = np.arctan2(sun_coord_gcrs.distance*np.sin(
+            elongation), moon_coord_gcrs.distance - sun_coord_gcrs.distance*np.cos(elongation))
+        IlluminatedMoonFraction = (1 + np.cos(moon_phase_angle))/2.0
+        moonStarSep_deg = Angle(
+            moon_coord_gcrs.separation(star_coord_gcrs)).degree
+        xSunBary_km, vSunBary_kmpd = get_body_barycentric_posvel('sun', t_obs)
+        vSunBary_kmps = vSunBary_kmpd.xyz.to(u.m/u.s)
+        xEarthBary_km, vEarthBary_kmpd = get_body_barycentric_posvel(
+            'earth', t_obs)
+        vEarthBary_kmps = vEarthBary_kmpd.xyz.to(u.km/u.s)
+        xMoonBary_km, vMoonBary_kmpd = get_body_barycentric_posvel(
+            'moon', t_obs)
+        vMoonBary_kmps = vMoonBary_kmpd.xyz.to(u.km/u.s)
 
-    # Calculate the angular separation between the target and the Moon
-    moon_ang = round(moon_coord_icrs.separation(target_coord).deg, 4)
+        uMoonSun = (xMoonBary_km - xSunBary_km) / \
+            (xMoonBary_km - xSunBary_km).norm()
+        dvMoonSun_kmps = vMoonBary_kmps - vSunBary_kmps
+        ProjVelMoonSun_kmps = dvMoonSun_kmps.dot(uMoonSun.get_xyz())
 
-    # Calculate the Moon's elevation above the horizon
-    # (GCRS here but could be ICRS, no impact)
-    moon_altaz = moon_coord.transform_to(AltAz(obstime=time, location=location))
-    moon_el = round(moon_altaz.alt.deg, 4)
+        uEarthMoon = (xEarthBary_km - xMoonBary_km) / \
+            (xEarthBary_km - xMoonBary_km).norm()
+        dvEarthMoon_kmps = vEarthBary_kmps - vMoonBary_kmps
+        ProjVelEarthMoon_kmps = dvEarthMoon_kmps.dot(uEarthMoon.get_xyz())
 
-    # Get the Sun's position and transform it to the observer's AltAz frame
-    sun = get_body("sun", time, location=location)
+        vel_moon_kmps = ProjVelEarthMoon_kmps + ProjVelMoonSun_kmps
 
-    sun_altaz = sun.transform_to(AltAz(obstime=time, location=location))
-    sun_el = sun_altaz.alt.deg
-
-    # Calculate the Moon's illumination
-    elongation = moon_coord.separation(sun)
-    moon_phase_angle = np.arctan2(
-        sun.distance * np.sin(elongation),
-        moon_coord.distance - sun.distance * np.cos(elongation),
-    )
-    moon_illu = round((1 + np.cos(moon_phase_angle).value) / 2 * 100, 4)
-
-    # Calculate the RV of reflected sunlight off moon
-    moon_rv = round(
-        get_moon_velocity_in_target_direction(target_ra, target_dec, jd_utc), 4
-    )
-
-    return [sun_el, moon_ang, moon_el, moon_illu, moon_rv]
-
-
-def get_moon_velocity_in_target_direction(
-    alpha_deg: float, delta_deg: float, julian_day: float
-) -> float:
-    """
-    Compute the velocity of the Moon projected in the direction of a given
-    target in the sky.
-
-    Parameters:
-        alpha_deg (float): Right Ascension (RA) of the target in degrees.
-        delta_deg (float): Declination (Dec) of the target in degrees.
-        julian_day (float): Julian date for the calculation.
-
-    Returns:
-        projected_velocity_km_s (float): Radial velocity of the Moon in km/s
-            in the target direction.
-    """
-
-    # Convert Julian Day to Astropy Time object
-    t = Time(julian_day, format="jd")
-
-    # Get the Moon's barycentric position & velocity (in AU and AU/day)
-    # using JPL ephemeris
-    moon_pos, moon_vel = get_body_barycentric_posvel("moon", t, ephemeris="jpl")
-
-    # Extract velocity components (AU/day)
-    x_vel, y_vel, z_vel = moon_vel.xyz.to_value(u.km / u.s)
-
-    # Convert target coordinates (RA, Dec) to radians
-    alpha_rad = np.deg2rad(alpha_deg)
-    delta_rad = np.deg2rad(delta_deg)
-
-    # Compute projected radial velocity
-    projected_velocity_km_s = (
-        x_vel * np.cos(alpha_rad) * np.cos(delta_rad)
-        + y_vel * np.sin(alpha_rad) * np.cos(delta_rad)
-        + z_vel * np.sin(delta_rad))
-
-    return projected_velocity_km_s
+        return [sun_el, moonStarSep_deg, moon_el, IlluminatedMoonFraction.value, vel_moon_kmps.value]

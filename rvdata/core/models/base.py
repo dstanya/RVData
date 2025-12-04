@@ -13,7 +13,6 @@ import git
 from git.exc import InvalidGitRepositoryError
 
 import pandas as pd
-import numpy as np
 from astropy.io import fits
 from astropy.table import Table
 
@@ -26,6 +25,7 @@ from rvdata.core.models.definitions import (
 )
 from rvdata.core.models.receipt_columns import RECEIPT_COL
 from rvdata.core.tools.git import get_git_branch, get_git_revision_hash, get_git_tag
+from rvdata.core.tools.headers import parse_value_to_datatype
 
 
 class RVDataModel(object):
@@ -129,16 +129,19 @@ class RVDataModel(object):
                 if isinstance(hdu, fits.PrimaryHDU):
                     self.headers[hdu.name] = hdu.header
                 elif isinstance(hdu, fits.BinTableHDU):
-                    t = Table.read(hdu)
                     if "RECEIPT" in hdu.name:
+                        t = Table.read(hdu)
                         # Table contains the RECEIPT
                         df: pd.DataFrame = t.to_pandas()
                         # TODO: get receipt columns from core.models.config.BASE-RECEIPT-columns.csv
-                        df = df.reindex(
-                            df.columns.union(RECEIPT_COL, sort=False),
-                            axis=1,
-                            fill_value="",
-                        )
+                        if df.empty:
+                            df = pd.DataFrame(columns=RECEIPT_COL)
+                        else:
+                            df = df.reindex(
+                                df.columns.union(RECEIPT_COL, sort=False),
+                                axis=1,
+                                fill_value="",
+                            )
                         setattr(self, hdu.name, df)
                         setattr(self, hdu.name.lower(), getattr(self, hdu.name))
                         self.headers[hdu.name] = hdu.header
@@ -156,7 +159,7 @@ class RVDataModel(object):
                 elif lvl == 3:
                     import rvdata.core.models.level3
 
-                    method = rvdata.core.models.level4.RV3._read
+                    method = rvdata.core.models.level3.RV3._read
                     method(self, hdu_list)
                 elif lvl == 4:
                     import rvdata.core.models.level4
@@ -183,29 +186,16 @@ class RVDataModel(object):
                 raise IOError("cannot recognize data type {}".format(instrument))
 
         # check and recast the headers into appropriate types
-        for i, row in pd.concat(
+        for _, row in pd.concat(
             [LEVEL2_PRIMARY_KEYWORDS, LEVEL3_PRIMARY_KEYWORDS, LEVEL4_PRIMARY_KEYWORDS]
         ).iterrows():
             key = row["Keyword"]
             if key in self.headers["PRIMARY"]:
                 value = self.headers["PRIMARY"][key]
-                if value is None:
-                    continue
-                try:
-                    if row["Data type"].lower() == "uint":
-                        self.headers["PRIMARY"][key] = int(value)
-                    elif row["Data type"].lower() == "float":
-                        self.headers["PRIMARY"][key] = float(value)
-                    elif row["Data type"].lower() == "string":
-                        self.headers["PRIMARY"][key] = str(value)
-                    elif row["Data type"].lower() == "double":
-                        self.headers["PRIMARY"][key] = np.float64(value)
-                    else:
-                        warnings.warn(f"Unknown type {row['Type']} for keyword {key}")
-                except (TypeError, AttributeError, ValueError):
-                    warnings.warn(
-                        f"Cannot convert value {value} for keyword {key} to type {row['Data type']}"
-                    )
+                parsed_value = parse_value_to_datatype(
+                    key, row["Data type"], value
+                )
+                self.headers["PRIMARY"][key] = parsed_value
 
         # compute MD5 sum of source file and write it into a receipt entry for tracking.
         # Note that MD5 sum has known security vulnerabilities, but we are only using
