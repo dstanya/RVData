@@ -242,5 +242,8 @@ class NEIDRV4(RV4):
             "Table of activity diagnostics for NEID science fiber trace"
         )
 
+        ext_table["Name"].append("DRP_CONFIG")
+        ext_table["Description"].append("DRP configuration parameters.")
+
         # Set extension Description table
         self.set_data("EXT_DESCRIPT", pd.DataFrame(ext_table))
