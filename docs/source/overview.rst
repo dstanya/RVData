@@ -1,5 +1,5 @@
-.. |eaccute| unicode:: U+00E9 :trim:
-.. |Eaccute| unicode:: U+00C9 :trim:
+.. |eaccute| unicode:: U+00E9
+.. |Eaccute| unicode:: U+00C9
 		       
 
 
@@ -126,7 +126,7 @@ The **EPRV Data Standardization Project** team is listed below.  Core team membe
   * Andrew Szentgyorgyi, Smithsonian Astrophysical Observatory, Collaborator (G-CLEF)
 
   * * |Eaccute| tienne Artigau, Universit |eaccute| \ de Montr |eaccute| al (Spirou, NIRPS)*
-  * Neil Cook, Universit&eacute; de Montr&eacute;al (Spirou, NIRPS)
+  * Neil Cook, Universit |eaccute| de Montr |eaccute| al (Spirou, NIRPS)
   * *Tanya Das, University of Chicago (MAROON-X)*
   * Joris De Ridder, KU Leuven (MARVEL)
   * *Xavier Dumusque, University of Geneva (HARPS, HARPS-N, EXPRESSO)*
@@ -141,6 +141,6 @@ The **EPRV Data Standardization Project** team is listed below.  Core team membe
   * Saskia Prins, KU Leuven (MARVEL)
   * *Timothy Pickering, MMT (Astropy, Specutils, Specreduce, SALT-HRS)*
   * *Martino Romaniello, European Southern Observatory (ESO, ESPRESSO, HARPS, NIRPS, CRIRES)*
-  * *Damien S&eacute;gransan, University of Geneva, (HARPS, HARPS-N, NIRPS, EXPRESSO, HARPS-3)*
+  * *Damien S  |eaccute| gransan, University of Geneva, (HARPS, HARPS-N, NIRPS, EXPRESSO, HARPS-3)*
   * Petr Skoda, Czech Academy of Sciences (PLATOspec)
   * Julian Sturmer, University of Heidelberg (2ES)
