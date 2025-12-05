@@ -59,3 +59,10 @@ The repository uses continuous integration and GitHub actions to validate all co
 
 Pull requests require two reviews from the reviewers listed on the :ref:`code-review-team`
 
+CI tests require data files to validate against the data level
+definitions. For instrument translators, these files should be native
+data files for the instrument, which get translated and then validated
+against the definition. For instruments which natively generate data
+in the standard format, these files should be representative files at
+each data level and will be validated against future base standard
+code changes.
