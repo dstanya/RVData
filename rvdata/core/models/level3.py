@@ -13,6 +13,7 @@ from rvdata.core.models.definitions import (
     BASE_DRP_CONFIG_COLUMNS,
     BASE_ORDER_TABLE_COLUMNS,
     BASE_RECEIPT_COLUMNS,
+    LEVEL2_PRIMARY_KEYWORDS,
     LEVEL3_EXTENSIONS,
     LEVEL3_PRIMARY_KEYWORDS,
 )
@@ -35,7 +36,9 @@ class RV3(rvdata.core.models.base.RVDataModel):
                 self.create_extension(row["Name"], row["DataType"])
 
         # initialize PRIMARY header keywords to defaults with units and descriptions
-        for _, row in LEVEL3_PRIMARY_KEYWORDS.iterrows():
+        for _, row in pd.concat(
+            [LEVEL2_PRIMARY_KEYWORDS, LEVEL3_PRIMARY_KEYWORDS]
+        ).iterrows():
             if row["Required"]:
                 keyword = row["Keyword"].split()[0]
                 datatype = row["DataType"]

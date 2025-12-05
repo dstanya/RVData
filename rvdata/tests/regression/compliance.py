@@ -91,11 +91,18 @@ def check_l4_extensions(inpfile):
 
 
 def check_l4_header(header):
-    ref_csv = (
+    ref_csv_l2 = (
+        importlib.resources.files("rvdata.core.models.config")
+        / "L2-PRIMARY-keywords.csv"
+    )
+    ref_csv_l4 = (
         importlib.resources.files("rvdata.core.models.config")
         / "L4-PRIMARY-keywords.csv"
     )
-    reference_header = pd.read_csv(ref_csv)
+    reference_header = pd.concat([
+        pd.read_csv(ref_csv_l2),
+        pd.read_csv(ref_csv_l4)
+    ], ignore_index=True)
     for i, row in reference_header.iterrows():
         key = row["Keyword"]
         req = row["Required"] == "Y"
