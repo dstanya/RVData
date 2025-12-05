@@ -143,7 +143,9 @@ class ESPRESSORV2(RV2):
 
         with fits.open(path) as hdu_raw:
             dpr_type = hdu_raw["PRIMARY"].header["HIERARCH ESO DPR TYPE"].split(",")[1]
-            slice_nb = config.slice_nb[hdu_raw['PRIMARY'].header['HIERARCH ESO INS MODE']]
+            slice_nb = config.slice_nb[
+                hdu_raw["PRIMARY"].header["HIERARCH ESO INS MODE"]
+            ]
 
         fibers = config.fiber.get(dpr_type, {})
         convert_RAW(self, path)
@@ -152,9 +154,7 @@ class ESPRESSORV2(RV2):
             convert_S2D_BLAZE(
                 self, names["s2d_blaze_file_" + fiber], trace_ind_start, slice_nb
             )
-            convert_BLAZE(
-                self, names["blaze_file_" + fiber], trace_ind_start, slice_nb
-            )
+            convert_BLAZE(self, names["blaze_file_" + fiber], trace_ind_start, slice_nb)
             if fiber == "A":
                 try:
                     convert_TELLURIC(
@@ -202,21 +202,19 @@ class ESPRESSORV2(RV2):
             base_dir = os.path.dirname(os.path.realpath(__file__))
 
             # Properly construct the file path
-            ext_descript_path = os.path.join(
-                base_dir, "config", "ext_descript.csv")
+            ext_descript_path = os.path.join(base_dir, "config", "ext_descript.csv")
             ext_descript_df = pd.read_csv(ext_descript_path)
-            self.set_data('EXT_DESCRIPT', ext_descript_df)
+            self.set_data("EXT_DESCRIPT", ext_descript_df)
         except Exception as e:
-            print('Error while setting EXT_DESCRIPT data:', e)
+            print("Error while setting EXT_DESCRIPT data:", e)
         try:
             base_dir = os.path.dirname(os.path.realpath(__file__))
 
             # Properly construct the file path
-            table_order_path = os.path.join(
-                base_dir, "config", "table_order.csv")
-            self.set_data('ORDER_TABLE', pd.read_csv(table_order_path))
+            table_order_path = os.path.join(base_dir, "config", "table_order.csv")
+            self.set_data("ORDER_TABLE", pd.read_csv(table_order_path))
         except Exception as e:
-            print('Error while setting ORDER_TABLE data:', e)
+            print("Error while setting ORDER_TABLE data:", e)
         # Remove empty extensions
         rm_list = []
         for key, value in self.headers.items():
@@ -225,7 +223,7 @@ class ESPRESSORV2(RV2):
         # We do not remove the extensions for now, as it is not needed
         # for key in rm_list:
         #    self.del_extension(key)
-        
+
         # Set extension description table - get rid of extensions not present
         ext_name_list = np.array(list(self.extensions))
         _, x_inds, _ = np.intersect1d(
