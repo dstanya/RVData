@@ -57,7 +57,7 @@ class NEIDRV3(RV3):
 
         # Set up the primary header
         phead = make_neid_primary_header.make_base_primary_header(hdul2[0].header)
-        phead["DATALVL"] = 3
+        phead["DATALVL"] = "L3"
 
         # Add L3 specific entries to the primary header
 
