@@ -242,5 +242,12 @@ class NEIDRV4(RV4):
             "Table of activity diagnostics for NEID science fiber trace"
         )
 
+        # Add CCF1 to the extension description table
+        ccf_row = pd.DataFrame([{
+            "Name": "CCF1",
+            "Description": "CCFs from which RV1 values were derived."
+        }])
+        ext_table = pd.concat([ext_table, ccf_row], ignore_index=True)
+        
         # Set extension Description table
         self.set_data("EXT_DESCRIPT", pd.DataFrame(ext_table))
