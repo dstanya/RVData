@@ -9,13 +9,13 @@ Version Control and Release Schedule
 Versioning of the Data Standard and versioning of the Translator Code
 are maintained independently.
 
-The Data Standard uses the `Calendar Versioning <https://calver.org/>`
+The Data Standard uses the `Calendar Versioning <https://calver.org/>`_
 scheme of YYYY.MM.  Updates to the standard will happen no more than
 twice per year and are planned for the months of February and
 August.  The first release version is *2026.02*.
 
-The Translator Code uses the `Semantic Versioning
-<https://semver.org/>` scheme of MAJOR.MINOR.PATCH. There is no
+The Translator Code uses the `Semantic Versioning <https://semver.org/>`_
+scheme of MAJOR.MINOR.PATCH. There is no
 prescribed release schedule, although it is anticipated that minor
 releases will be no more frequent than twice per year, also in
 Feburary and August.
