@@ -39,4 +39,9 @@ Data Standard Definition Team
 =============================
 
 
-TBD
+The Data Standard Definition Team are the code developers responsible
+for maintaining the translator codebase, and reviewing and
+implementing proposed code changes.
+
+This team is led by PI Jennifer Burt, assisted by Co-I BJ Fulton and
+Co-I Chad Bender.
