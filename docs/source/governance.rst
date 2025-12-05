@@ -1,5 +1,26 @@
-Project Governance
-******************
+Governance and Version Control
+******************************
+
+.. _versioning:
+
+Version Control and Release Schedule
+====================================
+
+Versioning of the Data Standard and versioning of the Translator Code
+are maintained independently.
+
+The Data Standard uses the `Calendar Versioning <https://calver.org/>`
+scheme of YYYY.MM.  Updates to the standard will happen no more than
+twice per year and are planned for the months of February and
+August.  The first release version is *2026.02*.
+
+The Translator Code uses the `Semantic Versioning
+<https://semver.org/>` scheme of MAJOR.MINOR.PATCH. There is no
+prescribed release schedule, although it is anticipated that minor
+releases will be no more frequent than twice per year, also in
+Feburary and August.
+
+
 
 .. _change-review-board:
 
@@ -10,8 +31,9 @@ We expect this to be a living standard and have thus established a
 Change Review Board (CRB) that includes representatives from some of
 the major stakeholders in the EPRV community including NASA, ESO,
 KPNO, Gemini, Keck, DACE & NExScI. The CRB will meet twice a year, in
-late April and late October, to review suggested updates to the Data
-Standard and determine if/when a new version should be released.
+late April (supporting an August release) and late October (supporting
+a February release), to review suggested updates to the Data Standard
+and determine if a new version should be released.
 
 
 Suggestions for updates to the data standard should be submitted as a
