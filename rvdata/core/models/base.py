@@ -223,11 +223,7 @@ class RVDataModel(object):
             # we only want to write to a '.fits file
             raise NameError("filename must end with .fits")
 
-        gen_hdul = getattr(self, "_create_hdul", None)
-        if gen_hdul is None:
-            raise TypeError("Write method not found. Is this the base class?")
-        else:
-            hdu_list = gen_hdul()
+        hdu_list = self._create_hdul()
         # finish up writing
         hdul = fits.HDUList(hdu_list)
         dirname = os.path.dirname(fn)
@@ -395,3 +391,62 @@ class RVDataModel(object):
                 )
         else:
             raise NameError("Name {} does not exist as extension".format(ext_name))
+
+    def _create_hdul(self):
+        """
+        Create an hdul in FITS format.
+        This is used by the base model for writing data context to file
+        """
+        hdu_list = []
+        hdu_definitions = self.extensions.items()
+        for key, value in hdu_definitions:
+            hduname = key
+            if value == "PrimaryHDU":
+                head = fits.Header()
+                for keyword, content in self.headers[key].items():
+                    head[keyword] = content
+                hdu = fits.PrimaryHDU(header=head)
+                hdu_list.insert(0, hdu)
+            elif value == "ImageHDU":
+                data = self.data[key]
+                if data is None:
+                    ndim = 0
+                else:
+                    ndim = len(data.shape)
+                self.headers[key]["NAXIS"] = ndim
+                if ndim == 0:
+                    self.headers[key]["NAXIS1"] = 0
+                else:
+                    for d in range(ndim):
+                        self.headers[key]["NAXIS{}".format(d + 1)] = data.shape[d]
+                head = fits.Header(self.headers[key])
+                try:
+                    hdu = fits.ImageHDU(data=data, header=head)
+                    hdu.name = hduname
+                    hdu_list.append(hdu)
+                except KeyError as ke:
+                    print("KeyError exception raised: -->ke=" + str(ke))
+                    print("Attempting to handle it...")
+                    if str(ke) == "'bool'":
+                        data = data.astype(float)
+                        print("------>SHAPE=" + str(data.shape))
+                        hdu = fits.ImageHDU(data=data, header=head)
+                        hdu_list.append(hdu)
+                    else:
+                        raise KeyError("A different error...")
+            elif value == "BinTableHDU":
+                table = Table.from_pandas(self.data[key])
+                self.headers[key]["NAXIS1"] = len(table)
+                head = fits.Header(self.headers[key])
+                hdu = fits.BinTableHDU(data=table, header=head)
+                hdu.name = hduname
+                hdu_list.append(hdu)
+            else:
+                print(
+                    "Can't translate {} into a valid FITS format.".format(
+                        type(self.data[key])
+                    )
+                )
+                continue
+
+        return hdu_list

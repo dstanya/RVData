@@ -8,13 +8,13 @@ from astropy.table import Table
 import numpy as np
 import pandas as pd
 
-from build.lib.rvdata.core.models.definitions import LEVEL3_PRIMARY_KEYWORDS
 import rvdata.core.models.base
 from rvdata.core.models.definitions import (
     BASE_DRP_CONFIG_COLUMNS,
     BASE_ORDER_TABLE_COLUMNS,
     BASE_RECEIPT_COLUMNS,
     LEVEL3_EXTENSIONS,
+    LEVEL3_PRIMARY_KEYWORDS,
 )
 from rvdata.core.tools.headers import parse_value_to_datatype
 
@@ -40,14 +40,14 @@ class RV3(rvdata.core.models.base.RVDataModel):
                 keyword = row["Keyword"].split()[0]
                 datatype = row["DataType"]
                 default = row["Default"]
+                description = row["Description"]
                 units = row["Units"]
                 if pd.isna(units) or units == "" or units.lower() == "N/A".lower():
                     unitstr = ""
                 else:
                     unitstr = f"[{units}] "
-                self.headers["PRIMARY"][keyword] = (
-                    parse_value_to_datatype(keyword, datatype, default),
-                    f"{unitstr}{row['Description']}",
+                self.headers["PRIMARY"][keyword] = parse_value_to_datatype(
+                    keyword, datatype, (default, f"{unitstr}{description}")
                 )
 
         # Add EXT_DESCRIPT as a DataFrame
@@ -129,62 +129,3 @@ class RV3(rvdata.core.models.base.RVDataModel):
                 row = "|{:20s} |{:20s} |{:20s}\n".format(name, "table", str(len(ext)))
                 head += row
         print(head)
-
-    def _create_hdul(self):
-        """
-        Create an hdul in FITS format.
-        This is used by the base model for writing data context to file
-        """
-        hdu_list = []
-        hdu_definitions = self.extensions.items()
-        for key, value in hdu_definitions:
-            hduname = key
-            if value == "PrimaryHDU":
-                head = fits.Header()
-                for keyword, (val, comment) in self.headers[key].items():
-                    head[keyword] = (val, comment)
-                hdu = fits.PrimaryHDU(header=head)
-                hdu_list.insert(0, hdu)
-            elif value == "ImageHDU":
-                data = self.data[key]
-                if data is None:
-                    ndim = 0
-                else:
-                    ndim = len(data.shape)
-                self.headers[key]["NAXIS"] = ndim
-                if ndim == 0:
-                    self.headers[key]["NAXIS1"] = 0
-                else:
-                    for d in range(ndim):
-                        self.headers[key]["NAXIS{}".format(d + 1)] = data.shape[d]
-                head = fits.Header(self.headers[key])
-                try:
-                    hdu = fits.ImageHDU(data=data, header=head)
-                    hdu.name = hduname
-                    hdu_list.append(hdu)
-                except KeyError as ke:
-                    print("KeyError exception raised: -->ke=" + str(ke))
-                    print("Attempting to handle it...")
-                    if str(ke) == "'bool'":
-                        data = data.astype(float)
-                        print("------>SHAPE=" + str(data.shape))
-                        hdu = fits.ImageHDU(data=data, header=head)
-                        hdu_list.append(hdu)
-                    else:
-                        raise KeyError("A different error...")
-            elif value == "BinTableHDU":
-                table = Table.from_pandas(self.data[key])
-                self.headers[key]["NAXIS1"] = len(table)
-                head = fits.Header(self.headers[key])
-                hdu = fits.BinTableHDU(data=table, header=head)
-                hdu.name = hduname
-                hdu_list.append(hdu)
-            else:
-                print(
-                    "Can't translate {} into a valid FITS format.".format(
-                        type(self.data[key])
-                    )
-                )
-                continue
-
-        return hdu_list
