@@ -14,6 +14,7 @@ Libraries
 
 from astropy.io import fits
 import os
+import numpy as np
 import pandas as pd
 from rvdata.core.models.level2 import RV2
 import rvdata.instruments.espresso.config.config as config
@@ -224,3 +225,21 @@ class ESPRESSORV2(RV2):
         # We do not remove the extensions for now, as it is not needed
         # for key in rm_list:
         #    self.del_extension(key)
+        
+        # Set extension description table - get rid of extensions not present
+        ext_name_list = np.array(list(self.extensions))
+        _, x_inds, _ = np.intersect1d(
+            ext_descript_df["Name"].values, ext_name_list, return_indices=True
+        )
+        i_to_drop = np.setdiff1d(np.arange(ext_descript_df.shape[0]), x_inds)
+
+        ext_descript_df.drop(i_to_drop, inplace=True)
+        ext_descript_df.reset_index(inplace=True, drop=True)
+
+        # Sort the extension description table to match the data object
+        i_for_sort = []
+        for name in ext_name_list:
+            i_for_sort.append(np.where(name == ext_descript_df["Name"].values)[0][0])
+        ext_descript_df = ext_descript_df.iloc[i_for_sort]
+
+        self.set_data("EXT_DESCRIPT", ext_descript_df)

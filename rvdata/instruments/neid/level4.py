@@ -77,6 +77,10 @@ class NEIDRV4(RV4):
         ext_table["Name"].append("INSTRUMENT_HEADER")
         ext_table["Description"].append("Primary header of native instrument file")
 
+        # Receipt
+        ext_table["Name"].append("RECEIPT")
+        ext_table["Description"].append("Table of operations that have been performed on this file")
+
         # RV1 - turn the CCFS extension header into a table
 
         neid_fsr = pd.read_csv(
