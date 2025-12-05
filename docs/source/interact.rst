@@ -65,4 +65,5 @@ data files for the instrument, which get translated and then validated
 against the definition. For instruments which natively generate data
 in the standard format, these files should be representative files at
 each data level and will be validated against future base standard
-code changes.
+code changes.  These files are stored on central servers - contact the
+:ref:`code-review-team` to load new or updated files.
