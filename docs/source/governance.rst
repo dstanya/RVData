@@ -1,6 +1,8 @@
 Project Governance
 ******************
 
+.. _change-review-board:
+
 Change Review Board
 ===================
 
@@ -35,13 +37,14 @@ board will likely result in changes to these code bases and so these
 teams may work in tandem.
 
 
-Data Standard Definition Team
-=============================
+.. _code-review-team:
+
+Code Review Team
+================
 
 
-The Data Standard Definition Team are the code developers responsible
-for maintaining the translator codebase, and reviewing and
-implementing proposed code changes.
+The Code Review Team are the code developers responsible for
+maintaining the translator codebase, and reviewing and implementing
+proposed code changes.
 
-This team is led by PI Jennifer Burt, assisted by Co-I BJ Fulton and
-Co-I Chad Bender.
+This team is comprised of Jennifer Burt, BJ Fulton, and Chad Bender.

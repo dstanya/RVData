@@ -13,6 +13,11 @@ Branch Structure
 * *develop*: Development branch where updates are aggregated between releases
 * *feature_branch_name*: Feature branches should be forked off of develop, and should be named with a human readable intuitive name. Delete feature branches once merged into develop and work in them is complete.
 
+Code Standards
+==============
+
+Code in this repository must be compatable with the `flake8 <https://flake8.pycqa.org/en/latest/>` standard and `Google style <https://flake8.pycqa.org/en/latest/>` docstrings.
+
 
 Developer Overview
 ==================
@@ -50,4 +55,7 @@ We recommend that developers use the following workflow:
 Testing & Integration
 =====================
 
-[In progress]
+The repository uses continuous integration and GitHub actions to validate all code changes at the pull request stage. These changes must complete prior to merging.
+
+Pull requests require two reviews from the reviewers listed on the :ref:`code-review-team`
+
