@@ -69,7 +69,7 @@ and places requirements on filenames, structure, and contents.
 
    *  Level 0 is not defined by the standard, but is envisioned to be
       the native raw data format returned by the instrument.
-   *  Level 1 is not definied by teh standard, bu t is envisioned to be
+   *  Level 1 is not definied by the standard, but is envisioned to be
       a minimally processed image data that is assembled to resemble
       the detector focal plane, and stored in an image extension. If a
       detector has multiple amplifiers, Level 1 contains a complete
@@ -102,7 +102,7 @@ Data Translator Overview
 ========================
 
 Instruments writing data in a native format can translate their data
-into the Standrad format by utilizing code in
+into the Standard format by utilizing code in
 https://github.com/EPRV-RCN/RVData .
 
 This repository contains RV2(), RV3(), and RV4() base classes to hold
