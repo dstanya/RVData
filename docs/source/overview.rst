@@ -97,6 +97,23 @@ and places requirements on filenames, structure, and contents.
       measurements, cross-correlation functions and metrics, and
       stellar activity indicators.
 
+
+Data Translator Overview
+========================
+
+Instruments writing data in a native format can translate their data
+into the Standrad format by utilizing code in
+https://github.com/EPRV-RCN/RVData .
+
+This repository contains RV2(), RV3(), and RV4() base classes to hold
+data required for generating the standard data files. These classes
+have a *write* method named *.tofits()* which outputs the data into
+the standard format.
+
+To integrate a new instrument into the translator, the instrument team
+should provide the corresponding *read* method that loads their native
+files into the base classes.  More details are provided in :ref:`new-reader` .
+
       
 Team Members
 ============
@@ -139,6 +156,6 @@ The **EPRV Data Standardization Project** team is listed below.  Core team membe
   * Saskia Prins, KU Leuven (MARVEL)
   * *Timothy Pickering, MMT (Astropy, Specutils, Specreduce, SALT-HRS)*
   * *Martino Romaniello, European Southern Observatory (ESO, ESPRESSO, HARPS, NIRPS, CRIRES)*
-  * *Damien S  |eaccute| gransan, University of Geneva, (HARPS, HARPS-N, NIRPS, EXPRESSO, HARPS-3)*
+  * *Damien S |eaccute| gransan, University of Geneva, (HARPS, HARPS-N, NIRPS, EXPRESSO, HARPS-3)*
   * Petr Skoda, Czech Academy of Sciences (PLATOspec)
   * Julian Sturmer, University of Heidelberg (2ES)
