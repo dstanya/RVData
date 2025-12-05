@@ -1,5 +1,5 @@
-.. |eaccute| unicode:: U+00E9 :trim:
-.. |Eaccute| unicode:: U+00C9 :trim:
+.. |eaccute| unicode:: U+00E9
+.. |Eaccute| unicode:: U+00C9
 		       
 
 
@@ -49,39 +49,37 @@ have a *translator* are encouraged to engage with the project to
 generate code for their instruments.
 
 The **EPRV Data Standardization Project** was funded by `NASA EPRV
-Foundational Science Grant 22-EPRV22_2-0018
-<https://nspires.nasaprs.com/external/solicitations/summary.do?solId=%7bE52C5EC5-E0FC-403E-1071-4802DB562F0C%7d&path=&method=init>`.
+Foundational Science Grant `22-EPRV22_2-0018 <https://nspires.nasaprs.com/external/solicitations/summary.do?solId=%7bE52C5EC5-E0FC-403E-1071-4802DB562F0C%7d&path=&method=init>`_.
 
 Data Standard Overview
 ======================
 
 The EPRV Data Standard stores data in FITS files and is compliant with
-`FITS v4.0 <https://fits.gsfc.nasa.gov/fits_standard.html>`. The
+`FITS v4.0 <https://fits.gsfc.nasa.gov/fits_standard.html>`_. The
 standard defines data products at different *Levels* of processing,
 and places requirements on filenames, structure, and contents.
 
 #. All compliant files will be named using the following scheme: **<inst>_SL<#>_<timestamp>.fits**
 
-   #. **<inst>** : Instrument name or abbreviation, in lower-case. (e.g., neid, kpf, expres). Different cameras are treated as separate instruments (e.g., for Maroon-X: mxred, mxblue)
-   #. **<SL#>** : Standard Level #, where # is typically 2, 3, 4, etc.
-   #. **<timestamp>** : Start of Exposure, corresponding to header DATE-OBS keyword. Limited to *YYYYMMDDTHHMMSS*. In cases where fractional seconds are required to distinguish files, add milliseconds as *sss*.
+   * **<inst>** : Instrument name or abbreviation, in lower-case. (e.g., neid, kpf, expres). Different cameras are treated as separate instruments (e.g., for Maroon-X: mxred, mxblue)
+   * **<SL#>** : Standard Level #, where # is typically 2, 3, 4, etc.
+   * **<timestamp>** : Start of Exposure, corresponding to header DATE-OBS keyword. Limited to *YYYYMMDDTHHMMSS*. In cases where fractional seconds are required to distinguish files, add milliseconds as *sss*.
 
 #. Standard data levels are defined as follows:
 
-   #. Level 0 is not defined by the standard, but is
-      envisioned to be the native raw data format returned by the
-      instrument.
-   #. Level 1 is not definied by teh standard, bu t is
-      envisioned to be a minimally processed image data that is
-      assembled to resemble the detector focal plane, and stored in an
-      image extension. If a detector has multiple amplifiers, Level 1
-      contains a complete image in a physical pixel reference
-      frame. This data level can have overscan and bias corrections
-      applied.  Details of headers and additional extensions are not
-      defined by the data standard. It is allowable that Level 1 is
-      identical to Level 0, if the lowest level product returned by
-      the instrument is a fully assembled image.
-   #. Level 2 will contain the 1D extracted order-by-order flux,
+   *  Level 0 is not defined by the standard, but is envisioned to be
+      the native raw data format returned by the instrument.
+   *  Level 1 is not definied by teh standard, bu t is envisioned to be
+      a minimally processed image data that is assembled to resemble
+      the detector focal plane, and stored in an image extension. If a
+      detector has multiple amplifiers, Level 1 contains a complete
+      image in a physical pixel reference frame. This data level can
+      have overscan and bias corrections applied.  Details of headers
+      and additional extensions are not defined by the data
+      standard. It is allowable that Level 1 is identical to Level 0,
+      if the lowest level product returned by the instrument is a
+      fully assembled image.
+   *  Level 2 will contain the 1D extracted order-by-order flux,
       wavelength, variance, and blaze in individual extensions. If the
       spectrograph produces N spectral traces, which corresponding to
       N object inputs in the detector optical input, (e.g., a
@@ -90,12 +88,12 @@ and places requirements on filenames, structure, and contents.
       extensions. The barycentric motion correction will be calculated
       and included in a separate extension, but not applied to the
       wavelength solution.
-   #. Level 3 will contain a 1D spectra with all orders stitched
+   *  Level 3 will contain a 1D spectra with all orders stitched
       together. The flux array will be blaze corrected and the
       wavelength solution will be corrected for instrument drift and
       barycentric motion. The variance array will be calculated using
       the blaze-corrected flux.
-   #. Level 4 will contain derived data products such as RV
+   *  Level 4 will contain derived data products such as RV
       measurements, cross-correlation functions and metrics, and
       stellar activity indicators.
 
@@ -126,7 +124,7 @@ The **EPRV Data Standardization Project** team is listed below.  Core team membe
   * Andrew Szentgyorgyi, Smithsonian Astrophysical Observatory, Collaborator (G-CLEF)
 
   * * |Eaccute| tienne Artigau, Universit |eaccute| \ de Montr |eaccute| al (Spirou, NIRPS)*
-  * Neil Cook, Universit&eacute; de Montr&eacute;al (Spirou, NIRPS)
+  * Neil Cook, Universit |eaccute| de Montr |eaccute| al (Spirou, NIRPS)
   * *Tanya Das, University of Chicago (MAROON-X)*
   * Joris De Ridder, KU Leuven (MARVEL)
   * *Xavier Dumusque, University of Geneva (HARPS, HARPS-N, EXPRESSO)*
@@ -141,6 +139,6 @@ The **EPRV Data Standardization Project** team is listed below.  Core team membe
   * Saskia Prins, KU Leuven (MARVEL)
   * *Timothy Pickering, MMT (Astropy, Specutils, Specreduce, SALT-HRS)*
   * *Martino Romaniello, European Southern Observatory (ESO, ESPRESSO, HARPS, NIRPS, CRIRES)*
-  * *Damien S&eacute;gransan, University of Geneva, (HARPS, HARPS-N, NIRPS, EXPRESSO, HARPS-3)*
+  * *Damien S  |eaccute| gransan, University of Geneva, (HARPS, HARPS-N, NIRPS, EXPRESSO, HARPS-3)*
   * Petr Skoda, Czech Academy of Sciences (PLATOspec)
   * Julian Sturmer, University of Heidelberg (2ES)
