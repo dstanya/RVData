@@ -8,13 +8,13 @@ from astropy.table import Table
 import numpy as np
 import pandas as pd
 
-from build.lib.rvdata.core.models.definitions import LEVEL3_PRIMARY_KEYWORDS
 import rvdata.core.models.base
 from rvdata.core.models.definitions import (
     BASE_DRP_CONFIG_COLUMNS,
     BASE_ORDER_TABLE_COLUMNS,
     BASE_RECEIPT_COLUMNS,
     LEVEL3_EXTENSIONS,
+    LEVEL3_PRIMARY_KEYWORDS,
 )
 from rvdata.core.tools.headers import parse_value_to_datatype
 
