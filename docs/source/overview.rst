@@ -49,14 +49,13 @@ have a *translator* are encouraged to engage with the project to
 generate code for their instruments.
 
 The **EPRV Data Standardization Project** was funded by `NASA EPRV
-Foundational Science Grant 22-EPRV22_2-0018
-<https://nspires.nasaprs.com/external/solicitations/summary.do?solId=%7bE52C5EC5-E0FC-403E-1071-4802DB562F0C%7d&path=&method=init>`.
+Foundational Science Grant `22-EPRV22_2-0018 <https://nspires.nasaprs.com/external/solicitations/summary.do?solId=%7bE52C5EC5-E0FC-403E-1071-4802DB562F0C%7d&path=&method=init>`_.
 
 Data Standard Overview
 ======================
 
 The EPRV Data Standard stores data in FITS files and is compliant with
-`FITS v4.0 <https://fits.gsfc.nasa.gov/fits_standard.html>`. The
+`FITS v4.0 <https://fits.gsfc.nasa.gov/fits_standard.html>`_. The
 standard defines data products at different *Levels* of processing,
 and places requirements on filenames, structure, and contents.
 
