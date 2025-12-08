@@ -1,4 +1,4 @@
-Keyword,Description,Units,Data type,Example Value,Default,Required,Notes
+Keyword,Description,Units,DataType,Example Value,Default,Required,Notes
 XTENSION,Name of the extension type,N/A,,IMAGE,UNKNOWN,True,
 EXTNAME,Extension contents,N/A,string,traceN_CCF,UNKNOWN,True,Description of what is in the extension
 CTYPE1,Name of axis 1,N/A,string,X,UNKNOWN,True,Generally pixel dimension
